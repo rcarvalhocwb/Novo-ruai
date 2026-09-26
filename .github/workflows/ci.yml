@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   money:
-    name: money (unit + propriedades)
+    name: money e workers (unit + propriedades)
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -40,10 +40,20 @@ jobs:
           sudo -u postgres psql -c "alter user postgres password 'postgres'"
       - name: Lint das migrações
         run: tools/ci/lint-migracoes.sh
-      - name: Migrações + checagens + pgTAP
+      - name: Migrações + checagens + pgTAP + concorrência
         env:
           PGPASSWORD: postgres
         run: tools/db-test.sh
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Ponta a ponta (borda → fila → inbox) com Postgres
+        env:
+          RUAI_DB_URL: postgres://postgres:postgres@localhost:5432/ruai_test
+        run: pnpm --filter @ruai/zet-consumer test
 
   segredos:
     name: gitleaks

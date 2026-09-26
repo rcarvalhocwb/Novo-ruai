@@ -10,7 +10,7 @@ Levantamento **somente leitura**, feito pelos conectores do Supabase e da Cloudf
 | iluminada | `irjlrsiudyfezdalgkeh` | sa-east-1 | Inativo | Desconhecido (pergunta D-13) |
 | `ruai-2026-hml` | — | sa-east-1 | **Não criado**: o conector expirou (timeout de 60 s) nas duas tentativas | Homologação do sistema novo |
 | (nome = e-mail do dono da organização) | `pophyumvrwjxuufltzey` | **ca-central-1** (Canadá) | Criado pelo dono em 26/09, vazio | **Não usar**: a região não pode ser mudada depois de criado. Decisão: recriar em `sa-east-1`; este, vazio, pode ser apagado |
-| **Iluminada2026** | `rxkvrcttkxwqmppdnxok` | **sa-east-1** | Criado pelo dono em 26/09. **Migrações 1 a 4 aplicadas** (fundação). Checagens de CI ok; security advisor sem erro nem aviso (só o aviso informativo de RLS sem policy, que é intencional: as tabelas negam tudo e o acesso é só pelas RPC do schema `api`) | Projeto do sistema novo |
+| **Iluminada2026** | `rxkvrcttkxwqmppdnxok` | **sa-east-1** | Criado pelo dono em 26/09. **Migrações 1 a 6 aplicadas** (fundação + inbox e processador da Zet + papel `ingest_writer` sem login + `pg_cron` a cada minuto). Checagens de CI ok; security advisor sem erro nem aviso (só o aviso informativo de RLS sem policy, que é intencional: as tabelas negam tudo e o acesso é só pelas RPC do schema `api`) | Projeto do sistema novo |
 
 A organização é **Pro**. Uma conta de outra pessoa é dona dela (D-14).
 
@@ -33,7 +33,8 @@ A organização é **Pro**. Uma conta de outra pessoa é dona dela (D-14).
 |---|---|---|
 | Worker `apizet` | Ativo desde 07/10/2025, última alteração 24/11/2025 | É o antigo `comprenozet-webhook-proxy`: repassa **qualquer** POST, sem token, de forma síncrona, para `comprenozet-webhook` do projeto antigo (S-21, S-23). CORS `*` |
 | R2 `ruailuminada` | Existe desde 08/12/2025 | Backups do sistema antigo (têm dados pessoais). Um endpoint público (`r2-backup`) consegue apagá-los |
-| KV, Hyperdrive, D1 | Nenhum | Tudo do sistema novo será criado do zero |
+| R2 `ruai-raw-hml` e `ruai-raw` | Criados em 26/09 (vazios), localização ENAM | Corpo cru dos webhooks do sistema novo |
+| KV, Hyperdrive, D1, filas | Nenhum | Criados no deploy (`workers/README.md`) |
 
 Na virada (`08`), o Worker `apizet` e a rota dele saem do ar. Até lá, o link do webhook no painel da Zet **não** deve apontar para ele no evento de 2026.
 

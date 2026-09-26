@@ -15,3 +15,5 @@ psql -v ON_ERROR_STOP=1 -q -d "$DB" -c "create extension if not exists pgtap wit
 echo "checagens de CI:"
 psql -v ON_ERROR_STOP=1 -q -d "$DB" -f tools/ci/checagens.sql
 pg_prove -d "$DB" --ext .sql -r supabase/tests
+echo "concorrência:"
+DB="$DB" tools/ci/concorrencia-zet.sh

@@ -1,0 +1,20 @@
+# Borda do webhook da Zet. Sem acesso ao banco.
+# Segredo (nunca no repositório): wrangler secret put ZET_URL_TOKEN --env <hml|production>
+name = "zet-ingest"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+workers_dev = false
+
+[env.hml]
+name = "zet-ingest-hml"
+routes = [{ pattern = "ingest-hml.ruailuminada.com", custom_domain = true }]
+vars = { SOURCE = "zet_hml" }
+r2_buckets = [{ binding = "RAW", bucket_name = "ruai-raw-hml" }]
+queues.producers = [{ binding = "ZET_QUEUE", queue = "zet-webhooks-hml" }]
+
+[env.production]
+name = "zet-ingest"
+routes = [{ pattern = "ingest.ruailuminada.com", custom_domain = true }]
+vars = { SOURCE = "zet" }
+r2_buckets = [{ binding = "RAW", bucket_name = "ruai-raw" }]
+queues.producers = [{ binding = "ZET_QUEUE", queue = "zet-webhooks" }]
