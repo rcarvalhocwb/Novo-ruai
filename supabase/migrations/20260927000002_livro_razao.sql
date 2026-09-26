@@ -175,7 +175,7 @@ create trigger je_period_open before insert on fin.journal_entries
   for each row execute function fin.trg_period_open();
 
 -- ---------- Saldos (derivados, nunca digitados) ----------
-create view fin.v_account_balances as
+create view fin.v_account_balances with (security_invoker = true) as
 select a.event_id, a.id as account_id, a.code, a.name, a.type, a.counterparty,
        coalesce(sum(case when p.side = a.normal_side then p.amount_cents else -p.amount_cents end), 0)::bigint
          as balance_cents
@@ -183,7 +183,7 @@ select a.event_id, a.id as account_id, a.code, a.name, a.type, a.counterparty,
   left join fin.postings p on p.account_id = a.id
  group by a.id;
 
-create view fin.v_daily_account_movements as
+create view fin.v_daily_account_movements with (security_invoker = true) as
 select e.event_id, e.business_date, p.account_id,
        coalesce(sum(p.amount_cents) filter (where p.side = 'D'), 0)::bigint as debit_cents,
        coalesce(sum(p.amount_cents) filter (where p.side = 'C'), 0)::bigint as credit_cents

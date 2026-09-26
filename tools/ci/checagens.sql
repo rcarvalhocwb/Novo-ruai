@@ -28,13 +28,13 @@ do $$ declare v text; begin
   if v is not null then raise exception 'colunas de dinheiro fora de bigint: %', v; end if;
 end $$;
 
--- 4. Toda função SECURITY DEFINER dos schemas da aplicação fixa o search_path.
+-- 4. Toda função dos schemas da aplicação fixa o search_path (lint 0011 do Supabase).
 do $$ declare v text; begin
   select string_agg(n.nspname||'.'||p.proname, ', ') into v
     from pg_proc p join pg_namespace n on n.oid = p.pronamespace
-   where p.prosecdef and n.nspname in ('api','fin','sales','integ','recon','access','audit')
+   where n.nspname in ('api','fin','sales','integ','recon','access','audit')
      and not exists (select 1 from unnest(coalesce(p.proconfig, '{}')) c where c like 'search_path=%');
-  if v is not null then raise exception 'security definer sem search_path: %', v; end if;
+  if v is not null then raise exception 'funções sem search_path fixo: %', v; end if;
 end $$;
 
 -- 5. anon não executa nada nos schemas da aplicação; e fin/audit não expõem função a authenticated.

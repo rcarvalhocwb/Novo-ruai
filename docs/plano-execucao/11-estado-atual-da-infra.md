@@ -10,6 +10,7 @@ Levantamento **somente leitura**, feito pelos conectores do Supabase e da Cloudf
 | iluminada | `irjlrsiudyfezdalgkeh` | sa-east-1 | Inativo | Desconhecido (pergunta D-13) |
 | `ruai-2026-hml` | — | sa-east-1 | **Não criado**: o conector expirou (timeout de 60 s) nas duas tentativas | Homologação do sistema novo |
 | (nome = e-mail do dono da organização) | `pophyumvrwjxuufltzey` | **ca-central-1** (Canadá) | Criado pelo dono em 26/09, vazio | **Não usar**: a região não pode ser mudada depois de criado. Decisão: recriar em `sa-east-1`; este, vazio, pode ser apagado |
+| **Iluminada2026** | `rxkvrcttkxwqmppdnxok` | **sa-east-1** | Criado pelo dono em 26/09. **Migrações 1 a 4 aplicadas** (fundação). Checagens de CI ok; security advisor sem erro nem aviso (só o aviso informativo de RLS sem policy, que é intencional: as tabelas negam tudo e o acesso é só pelas RPC do schema `api`) | Projeto do sistema novo |
 
 A organização é **Pro**. Uma conta de outra pessoa é dona dela (D-14).
 
@@ -51,3 +52,10 @@ Na virada (`08`), o Worker `apizet` e a rota dele saem do ar. Até lá, o link d
 | D-13 | O que é o projeto inativo `iluminada` (`irjlrsiudyfezdalgkeh`)? Tem dados a preservar? | Dono do evento |
 | D-14 | Os projetos de 2026 ficam na organização atual, cuja dona é a conta de outra pessoa? Quem paga, e quem tem acesso de dono? | Dono do evento |
 | D-15 | Quem faz o `pg_dump` completo e o download do R2 do sistema antigo, e quando? (Pré-requisito da migração; o banco antigo não é alterado) | Dono do evento |
+
+## Pendências no painel do projeto Iluminada2026 (só o dono consegue)
+
+1. **Settings → API → Exposed schemas:** deixar só `api` (tirar `public` e `graphql_public`).
+2. **Authentication → MFA:** ligar TOTP. Sem MFA, admin e aprovador são recusados pelo banco.
+3. **Authentication → Password security:** ligar a proteção contra senhas vazadas.
+4. Apagar o projeto vazio de ca-central-1 (`pophyumvrwjxuufltzey`).
