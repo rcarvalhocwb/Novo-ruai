@@ -41,14 +41,21 @@
 | **Total de pessoas no evento** | | | | | | |
 | Online com visita hoje que **não** foram validados (no-show ou falha de validação) | | | | | | |
 
-### C. Ticket médio (informativo)
-Cada um com a sua base, **sem misturar**:
+### C. Ticket médio (calculado sobre o público que entrou)
+
+**Regra confirmada:** o ticket médio oficial é calculado sobre **quem entrou no dia** e o **valor efetivamente pago por esses ingressos**. Mostra a efetividade do público presente.
+
 | Indicador | Fórmula |
 |---|---|
-| Ticket médio da bilheteria | receita da bilheteria no dia ÷ ingressos vendidos na bilheteria no dia (sem cortesias) |
-| Ticket médio online (venda) | líquido das vendas online do dia ÷ ingressos online vendidos no dia. Exemplo real: **20/12/2025 = R$ 78.066,00 ÷ 2.829 = R$ 27,59** |
-| Ticket médio por pessoa que entrou | valor pago pelos ingressos **usados** no dia ÷ pessoas que entraram. Usa o valor real de cada voucher, que o sistema guarda |
-| Mix de tipos | % de inteira, meia, social, Gazeta, cortesia (vendidos e entrados) |
+| **Ticket médio geral do dia** | Σ valor pago pelos ingressos **utilizados** no dia (bilheteria + online) ÷ pessoas que entraram |
+| Ticket médio da bilheteria | Σ valor dos cartões RFID que entraram no dia ÷ entradas da bilheteria. Como a bilheteria vende e entra no mesmo dia, é praticamente a receita da bilheteria ÷ entradas |
+| Ticket médio online | Σ valor líquido dos vouchers **validados** no dia (valor real de cada voucher, mesmo que comprado dias antes) ÷ vouchers validados |
+| Com e sem cortesia | Mostrado das duas formas: cortesia é uma pessoa que entrou com valor zero, então puxa a média para baixo |
+| Mix de tipos | % de inteira, meia, social, Gazeta e cortesia **entre quem entrou** |
+
+Isso só é possível porque o sistema guarda o **valor pago em cada ingresso** (rateado pelo preço de tabela, já com desconto de campanha) e a validação de cada voucher (borderô por voucher). Se o borderô vier só por tipo, o valor online usa o preço pago médio de cada tipo naquele dia de visita, e o relatório sinaliza que é aproximado.
+
+A **venda média do dia** (líquido vendido ÷ ingressos vendidos; ex.: 20/12/2025 = R$ 27,59 no online) continua disponível, mas como indicador **comercial**, separado do ticket médio.
 
 ### D. Previsão de público (a partir dos webhooks)
 Ingressos online **válidos** (vendidos − estornados) por data de visita, para os próximos dias, com o histórico de comparecimento para estimar quantos virão. Exemplo real, com o que já tinha sido vendido até 20/12/2025:

@@ -266,7 +266,7 @@ update inbox set status='processed', processed_at=now()
 | Enxurrada de requisições (ataque ou reenvio em massa depois de uma queda) | WAF/rate limit na borda; corpo de no máximo 64 KB; o endpoint **não toca o banco**; a fila absorve o pico e o consumidor entrega no ritmo que o banco aguenta; o worker processa 1 pedido por vez com lock |
 | Banco ou AWS fora do ar | A borda continua aceitando e guardando; nada depende do banco para responder à Zet. Quando o banco volta, a fila é drenada aos poucos. Se algo ainda faltar, o **pull de conciliação** (abaixo) recupera |
 | Apagamento de dados | Inbox e livro-razão append-only, sem DELETE nem para `service_role`; PITR; dump externo imutável |
-| Webhook que nunca chegou | **Job diário de conciliação**: baixa o relatório da Zet (API ou planilha) e compara pedido a pedido com `zet_orders`. O que faltar vira exceção e pode ser importado a partir do relatório, com `source='zet_report'` |
+| Webhook que nunca chegou | **Robô diário no painel da Zet** (`13-ROBO-PAINEL-ZET.md`) ou relatório exportado. **Job diário de conciliação**: baixa o relatório da Zet (API ou planilha) e compara pedido a pedido com `zet_orders`. O que faltar vira exceção e pode ser importado a partir do relatório, com `source='zet_report'` |
 
 ## 8. Conciliação Zet (diária)
 

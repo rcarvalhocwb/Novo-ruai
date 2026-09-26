@@ -590,7 +590,7 @@ select a.event_id, a.counterparty as store, a.code, a.name, b.balance_cents as p
 ```sql
 create table recon.statement_imports (
   id          bigserial primary key,
-  source      text not null check (source in ('bank','pagbank','zet_report')),
+  source      text not null check (source in ('bank','pagbank','zet_report','zet_panel','zet_bordero')),
   file_name   text not null,
   file_sha256 bytea not null unique,           -- mesmo arquivo não entra duas vezes
   imported_at timestamptz not null default now(),

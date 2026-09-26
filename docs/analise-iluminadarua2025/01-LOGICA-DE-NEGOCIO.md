@@ -164,6 +164,8 @@ O manual antigo (passo 3.6) fala em "pagar comissões de lojas" como despesa e e
 | R20 | Ingressos online são validados pela **equipe da Zet no app dela**, em fila separada; não passam pela catraca (exceto em dias de teste). A entrada online vem do **borderô da Zet**, importado todo dia. |
 | R21 | O fechamento do dia mostra, separados: vendas do dia (bilheteria e online), estornos do dia, entradas do dia (bilheteria e online; online dividido em compradas hoje e antes), ticket médio de cada canal e previsão de público por data de visita. |
 | R22 | Ingresso online vendido e não estornado é receita do evento, tenha sido utilizado ou não. O acerto com a Zet é: vendas − estornos − repasses recebidos. |
+| R23 | **Ticket médio** = valor pago pelos ingressos de quem **entrou** no dia ÷ pessoas que entraram (geral, bilheteria e online; com e sem cortesia). A venda média do dia é um indicador comercial separado. |
+| R24 | Um **robô** acessa diariamente o painel administrativo da Zet e traz vendas, estornos, borderô e relatórios para conciliar com os webhooks. Ver `13-ROBO-PAINEL-ZET.md`. |
 | R13 | Divergência de catraca: alerta acima de 5%, crítico acima de 10%; mais de 20 entradas de diferença é suspeita de fraude. |
 
 ## 4. Modelo de dados atual (resumo)

@@ -33,6 +33,8 @@ A análise marcou como **[DÚVIDA]** tudo o que o código não permite afirmar. 
 17b. Qual é a **política de cancelamento/estorno** da Zet (até quando o cliente pode pedir), e por quanto tempo a Zet retém valores por causa de chargeback? Quem arca com chargeback?
 17c. Qual é a **agenda de repasses** (D+quanto, por lote de vendas) e existe relatório da composição de cada repasse?
 
+17d. **Robô no painel:** a Zet autoriza acesso automatizado ao painel administrativo (por escrito)? Dá para ter um usuário só de leitura? Quais relatórios têm exportação? O login tem captcha ou 2FA? (Ver `13-ROBO-PAINEL-ZET.md`.)
+
 ## Sobre o incidente
 
 17. ~~O que foi perdido~~ **Respondida:** os payloads de uma data (o dia do apagão da AWS) ficaram corrompidos depois de uma enxurrada de requisições que travou o banco; os valores deixaram de bater com a plataforma.

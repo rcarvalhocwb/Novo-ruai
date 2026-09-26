@@ -24,6 +24,7 @@ Cada fase entrega algo utilizável e tem **critério de aceite objetivo**. Uma f
 - De-para de eventos e tipos de ingresso.
 - Borda com WAF e rate limit.
 - Job diário de conciliação Zet × sistema.
+- Robô diário no painel da Zet (vendas, estornos, borderô, repasses), com snapshot e hash, e conciliação automática (`13-ROBO-PAINEL-ZET.md`).
 - Importação diária do borderô da Zet (validações) e relatório diário de público, ticket médio e previsão; extrato conta-corrente Zet (`12-RELATORIO-DIARIO-E-ACERTO-ZET.md`).
 
 **Aceite:** os testes de webhook passam (token, duplicata, CP repetido com valor diferente, ES parcial, ES antes de CP, CP depois de ES, 50 CPs concorrentes geram 1 venda, **banco desligado durante o teste sem perder nenhum webhook**); teste de carga de 200 req/s sem degradar o banco; um dia de homologação com o relatório Zet × sistema **R$ 0,00**.
