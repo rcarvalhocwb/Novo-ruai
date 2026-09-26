@@ -57,9 +57,9 @@ Cada guichê fecha **separadamente**, na sessão do seu operador. O fechamento d
 ### Catraca (no fechamento do dia, não por guichê)
 - Entradas da catraca no dia × ingressos válidos para o dia (online com visita no dia + bilheteria). Alerta acima de 5%, crítico acima de 10% (regra atual mantida).
 
-## 4. Regra de tolerância recomendada
+## 4. Regra de tolerância (aprovada)
 
-A tolerância não serve para "esconder" diferença; ela só define **o quanto de justificativa e aprovação** cada diferença exige. Os valores são **configuráveis por evento**:
+A tolerância não serve para "esconder" diferença; ela só define **o quanto de justificativa e aprovação** cada diferença exige. Os valores abaixo foram aprovados como padrão e ficam **editáveis numa tela de configurações do evento** (tabela `fin.event_settings`, alterações registradas na auditoria):
 
 | Diferença do guichê | O que acontece |
 |---|---|
@@ -150,3 +150,46 @@ $$;
 ```
 
 A receita dos ingressos (`tickets_revenue_cents`) é comparada com dinheiro + cartão + PIX do guichê na tela da etapa 3, usando os lançamentos da sessão.
+
+## 7. Integração com as maquininhas PagBank (uma por guichê)
+
+Cada guichê tem a sua maquininha. O sistema antigo usava a API de transações do PagSeguro (`ws.pagseguro.uol.com.br/v4/transactions`, em `fetch-pagseguro-sales`), que é voltada a pagamentos online, e dependia de importação de CSV.
+
+**Recomendação: API do Extrato EDI do PagBank** (`https://edi.api.pagbank.com.br/movement/v3.00/{transactional|financial}/{AAAA-MM-DD}`), documentada em developer.pagbank.com.br:
+- Traz cada transação da conta em JSON, com valor bruto, taxa, líquido, meio de pagamento, data prevista de pagamento e identificação da maquininha (confirmar o nome exato do campo do número de série no manual EDI).
+- Acesso por usuário (número do estabelecimento) e **token EDI**, que é solicitado ao PagBank.
+- **Os dados saem em D+1**, não em tempo real.
+
+Como isso se encaixa no fechamento:
+
+| Momento | Fonte | O que confere |
+|---|---|---|
+| No fechamento do guichê (mesmo dia) | Relatório impresso ou do app da maquininha, digitado ou fotografado pelo operador | Total de cartão e PIX do guichê |
+| No dia seguinte, automático | API EDI, por número de série da maquininha → guichê | Cada transação, com a **taxa real** (MDR). O que não bater com o que o operador declarou vira exceção |
+| Na liquidação (D+x) | API EDI financeira + extrato bancário | "A receber PagBank" zera quando o dinheiro cai na conta |
+
+Cadastro: tabela de maquininhas (`número de série → guichê`, com vigência, porque uma maquininha pode trocar de guichê).
+
+**Opção futura (tempo real)**: as maquininhas PagBank Smart (Android) aceitam um aplicativo próprio via SDK de integração do PagBank. Com ele, a **venda do ingresso e o pagamento acontecem no mesmo terminal**: o sistema registra cada venda, com o tipo de ingresso e o meio de pagamento, na hora. Isso elimina a digitação e a conferência de cartão no fechamento. É um projeto maior; vale avaliar depois que o núcleo estiver pronto.
+
+## 8. Conciliação com a catraca
+
+A ideia de usar a catraca para conferir as vendas está certa: **toda entrada tem de corresponder a um ingresso pago** (ou a uma cortesia registrada). Mas multiplicar o número de acessos por um valor médio dá uma conta fraca, porque:
+- a catraca não sabe o preço: há inteira, meia (R$ 18), solidário (R$ 25), Gazeta e cortesias no mesmo giro;
+- quem comprou online pode entrar em outro dia (data da venda × data da visita);
+- há reentradas, giros negados e passagens de staff.
+
+**Forma melhor: conciliar por ingresso e por quantidade, e só então por valor.** O sistema já tem o que precisa:
+- **Bilheteria**: o cartão RFID entregue ao cliente tem tipo (MEIA, INTEIRA...), e cada passagem registra o cartão (`access_events.card_id`). Então se sabe **quantas entradas de cada tipo** vieram da bilheteria no dia.
+- **Online**: o voucher da Zet é validado na catraca (QR), e o próprio payload da Zet traz `used` e `dateTimeUsed`. Então se sabe **quais vouchers** entraram no dia.
+
+| Nível | Conferência | Resultado esperado |
+|---|---|---|
+| 1. Por ingresso | Cada passagem autorizada corresponde a um cartão RFID vendido naquele dia ou a um voucher válido para aquela data | Passagem sem ingresso = alerta (possível fraude ou cartão não devolvido) |
+| 2. Por tipo (bilheteria) | Entradas por tipo × cartões vendidos por tipo nos 9 guichês | Iguais, descontadas as reentradas |
+| 3. Por valor (bilheteria) | Σ (entradas por tipo × preço do tipo) × receita dos 9 guichês (dinheiro + cartão + PIX) | Igual; a diferença aponta tipo errado (meia vendida como inteira) ou venda sem registro |
+| 4. Online por data de visita | Vouchers usados no dia × vouchers com visita no dia | Não comparecimento é normal; entrada sem voucher válido, não |
+
+O valor estimado pela catraca (nível 3) continua existindo, como você propôs, mas calculado **com o preço de cada tipo**, e não com um valor médio, e só depois de bater as quantidades. Assim, quando o valor não bate, o sistema já sabe se o problema é quantidade (alguém entrou sem pagar) ou preço (tipo errado).
+
+Alertas mantidos: divergência de quantidade acima de 5% = alerta; acima de 10% = crítico.

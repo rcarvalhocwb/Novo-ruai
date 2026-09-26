@@ -16,9 +16,9 @@ A análise marcou como **[DÚVIDA]** tudo o que o código não permite afirmar. 
 9a. ~~**Fundo de troco**~~ **Respondida:** varia por operador; vai junto na sangria e é retirado de novo no início do dia seguinte. Nada fica de um dia para o outro.
 10. ~~**Contas bancárias**~~ **Respondida:** cadastradas e alteradas durante o evento, com transferência entre contas. *Observação:* se alguma conta for de pessoa física (o código antigo cita `fabio`), convém registrar o titular para a prestação de contas.
 
-25. **Tolerâncias do fechamento por guichê:** os valores sugeridos são até R$ 1,00 com justificativa opcional, de R$ 1,01 a R$ 50,00 com justificativa obrigatória e acima de R$ 50,00 em destaque para os assinantes. Servem ou prefere outros? (São configuráveis por evento.)
-26. **Sangria parcial durante o dia:** algum guichê faz retirada de dinheiro antes do fechamento (por segurança, quando acumula muito)? Se sim, ela precisa ser registrada na hora.
-27. **Maquininhas:** cada guichê tem a sua maquininha PagBank fixa? Isso permite conferir cartão e PIX por guichê pelo número de série.
+25. ~~Tolerâncias~~ **Respondida:** valores aprovados, editáveis numa tela de configuração do evento.
+26. ~~Dinheiro no guichê~~ **Respondida:** no fechamento não fica dinheiro no guichê. *Ainda a confirmar:* há retirada de dinheiro **durante** o dia (antes do fechamento)? Se houver, o sistema tem a sangria parcial registrada na hora.
+27. ~~Maquininhas~~ **Respondida:** uma por guichê. *Próximo passo:* pedir ao PagBank o **token da API do Extrato EDI** (importação automática em D+1) e informar se as maquininhas são do modelo Smart (Android), o que permitiria integração em tempo real.
 
 ## Para a Zet (técnico)
 

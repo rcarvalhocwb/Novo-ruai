@@ -158,6 +158,9 @@ O manual antigo (passo 3.6) fala em "pagar comissões de lojas" como despesa e e
 | R14 | Cada um dos 9 caixas abre com um **fundo de troco** (valor pode variar por operador) e o devolve no fechamento junto com a venda. O fundo não é receita. **Nenhum valor fica de um dia para o outro**: o fundo vai na sangria e é retirado de novo no dia seguinte; a tesouraria termina o dia zerada. |
 | R15 | Após o fechamento, a **sangria** leva o dinheiro para conta bancária ou para pagamento de despesas do evento, sempre com registro. |
 | R16 | Descontos só existem em **campanhas** e reduzem a receita do ingresso. O `totalValue` da Zet já vem com o desconto; `discount` é só informativo. |
+| R17 | Tolerâncias do fechamento por guichê: até R$ 1,00 justificativa opcional; R$ 1,01 a R$ 50,00 obrigatória; acima de R$ 50,00 destaque para os assinantes. **Editáveis por evento.** |
+| R18 | Cada guichê tem a sua maquininha PagBank; no fechamento do guichê não fica dinheiro na gaveta. |
+| R19 | A catraca concilia as vendas: cada entrada deve corresponder a um ingresso pago; a conferência é por ingresso, por tipo e depois por valor (preço de cada tipo). |
 | R13 | Divergência de catraca: alerta acima de 5%, crítico acima de 10%; mais de 20 entradas de diferença é suspeita de fraude. |
 
 ## 4. Modelo de dados atual (resumo)

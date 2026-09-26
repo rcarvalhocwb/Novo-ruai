@@ -29,7 +29,9 @@ Cada fase entrega algo utilizável e tem **critério de aceite objetivo**. Uma f
 
 ## Fase 3: Bilheteria e fechamento (2 semanas)
 - Sessões de caixa (abertura, fechamento, contagem) gerando lançamentos.
-- Importador PagBank (CSV) com MDR real; importador OFX do banco.
+- Importação automática das maquininhas pela API do Extrato EDI do PagBank (D+1, por número de série → guichê), com a taxa real; CSV só como plano B; importador OFX do banco.
+- Conciliação da catraca por ingresso, por tipo e por valor (`10-ASSISTENTE-FECHAMENTO.md`, seção 8).
+- Tela de configurações do evento (tolerâncias, caixa mínimo, assinantes, contas bancárias).
 - Wizard de fechamento: esperado (livro-razão) × declarado; quebra e sobra como lançamento; assinatura; aprovação; trava do dia; hash no PDF.
 - Rascunho em tabela separada.
 
