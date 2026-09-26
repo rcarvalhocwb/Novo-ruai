@@ -18,6 +18,7 @@
 - [ ] Diferença esperado × declarado: se ≠ 0, lançamento de quebra ou sobra **com justificativa**.
 
 **Online**
+- [ ] Borderô da Zet do dia importado (validações por voucher ou por tipo).
 - [ ] Vendas Zet do dia (sistema) = relatório Zet.
 - [ ] Estornos do dia conferidos.
 - [ ] Repasses Zet recebidos casados com "A receber Zet".
@@ -31,7 +32,7 @@
 **Catraca (controle de pessoas; não entra no valor do caixa)**
 - [ ] Nenhuma entrada sem ingresso válido para a data (cartão RFID vendido no dia ou voucher com visita no dia).
 - [ ] Bilheteria: entradas por tipo × cartões vendidos por tipo; divergência acima de 5% justificada.
-- [ ] Online: comparecimento do dia registrado (usados × com visita no dia).
+- [ ] Online (pelo borderô): entradas do dia, divididas em compradas hoje × antes; ingressos com visita hoje não utilizados listados.
 
 **Encerramento**
 - [ ] Revisão do resumo (receitas, despesas, saldo por conta).

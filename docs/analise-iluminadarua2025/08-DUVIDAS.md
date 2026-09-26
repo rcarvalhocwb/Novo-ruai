@@ -29,6 +29,10 @@ A análise marcou como **[DÚVIDA]** tudo o que o código não permite afirmar. 
 15. Existe **API de consulta** de pedidos (por período e por uuid) ou só export do painel?
 16. Existe relatório de **composição de cada repasse** (quais pedidos entraram)?
 
+17a. O **borderô** pode ser exportado **por voucher** (código + data e hora da validação), e não só total por tipo? Existe API de validações?
+17b. Qual é a **política de cancelamento/estorno** da Zet (até quando o cliente pode pedir), e por quanto tempo a Zet retém valores por causa de chargeback? Quem arca com chargeback?
+17c. Qual é a **agenda de repasses** (D+quanto, por lote de vendas) e existe relatório da composição de cada repasse?
+
 ## Sobre o incidente
 
 17. ~~O que foi perdido~~ **Respondida:** os payloads de uma data (o dia do apagão da AWS) ficaram corrompidos depois de uma enxurrada de requisições que travou o banco; os valores deixaram de bater com a plataforma.

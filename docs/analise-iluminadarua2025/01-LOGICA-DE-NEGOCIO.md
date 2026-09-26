@@ -161,6 +161,9 @@ O manual antigo (passo 3.6) fala em "pagar comissões de lojas" como despesa e e
 | R17 | Tolerâncias do fechamento por guichê: até R$ 1,00 justificativa opcional; R$ 1,01 a R$ 50,00 obrigatória; acima de R$ 50,00 destaque para os assinantes. **Editáveis por evento.** |
 | R18 | Cada guichê tem a sua maquininha PagBank (a maioria Smart); no fechamento do guichê não fica dinheiro na gaveta. Pode haver **sangria parcial durante o dia**, registrada na hora, com quem entregou e quem recebeu. |
 | R19 | **O fechamento segue o dinheiro**: vendas pela data do pagamento, estornos pela data do estorno, recebimentos pela data do crédito. A catraca controla **pessoas** (entrada sem ingresso, tipo, comparecimento) e **nunca** vira valor no caixa. Receita por data de visita é só relatório contábil. Ver `11-VENDA-X-ENTRADA.md`. |
+| R20 | Ingressos online são validados pela **equipe da Zet no app dela**, em fila separada; não passam pela catraca (exceto em dias de teste). A entrada online vem do **borderô da Zet**, importado todo dia. |
+| R21 | O fechamento do dia mostra, separados: vendas do dia (bilheteria e online), estornos do dia, entradas do dia (bilheteria e online; online dividido em compradas hoje e antes), ticket médio de cada canal e previsão de público por data de visita. |
+| R22 | Ingresso online vendido e não estornado é receita do evento, tenha sido utilizado ou não. O acerto com a Zet é: vendas − estornos − repasses recebidos. |
 | R13 | Divergência de catraca: alerta acima de 5%, crítico acima de 10%; mais de 20 entradas de diferença é suspeita de fraude. |
 
 ## 4. Modelo de dados atual (resumo)
