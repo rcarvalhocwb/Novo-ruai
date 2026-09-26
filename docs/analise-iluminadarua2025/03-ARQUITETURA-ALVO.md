@@ -131,7 +131,8 @@ No SQL, a mesma regra: `(amount_cents * bps + 5000) / 10000` em `bigint`.
 
 | Código | Conta | Tipo | Natureza |
 |--------|-------|------|----------|
-| 1.1.01 | Caixa físico – bilheteria (1 por caixa, se quiser) | Ativo | D |
+| 1.1.00 | Tesouraria / cofre do evento | Ativo | D |
+| 1.1.01 a 1.1.09 | Caixa bilheteria 1 a 9 | Ativo | D |
 | 1.1.02 | Banco – conta principal | Ativo | D |
 | 1.2.01 | A receber – Zet | Ativo | D |
 | 1.2.02 | A receber – PagBank (cartão/PIX) | Ativo | D |
@@ -143,6 +144,7 @@ No SQL, a mesma regra: `(amount_cents * bps + 5000) / 10000` em `bigint`.
 | 4.1.03 | Receita produtos bilheteria | Receita | C |
 | 4.2.01 | Receita comissão foods | Receita | C |
 | 4.9.01 | Estornos de ingressos online | Redutora de receita | D |
+| 4.9.02 | Estornos da bilheteria | Redutora de receita | D |
 | 5.1.02 | Taxa PagBank (MDR) | Despesa | D |
 | 5.2.01 | Quebra de caixa | Despesa | D |
 | 5.9.xx | Despesas operacionais | Despesa | D |
@@ -154,19 +156,24 @@ No SQL, a mesma regra: `(amount_cents * bps + 5000) / 10000` em `bigint`.
 | Venda Zet (CP): ingresso 30,00, taxa 3,00, cliente paga 33,00 | A receber Zet 30,00 | Receita online 30,00 |
 | Estorno Zet (ES) do mesmo pedido | Estornos online 30,00 | A receber Zet 30,00 |
 | Repasse Zet cai no banco (98.000,00) | Banco 98.000,00 | A receber Zet 98.000,00 |
-| Venda bilheteria em dinheiro | Caixa físico | Receita bilheteria |
+| Abertura do caixa 3 com fundo de troco de 200,00 | Caixa bilheteria 3 200,00 | Tesouraria 200,00 |
+| Venda bilheteria em dinheiro | Caixa bilheteria N | Receita bilheteria |
+| Estorno na bilheteria (sempre total), em dinheiro | Estornos da bilheteria | Caixa bilheteria N |
+| Estorno na bilheteria, em cartão/PIX | Estornos da bilheteria | A receber PagBank |
 | Venda bilheteria em cartão, bruto 100,00, MDR real 3,08 | A receber PagBank 96,92 · Taxa PagBank 3,08 | Receita bilheteria 100,00 |
 | Liquidação PagBank | Banco | A receber PagBank |
-| Depósito do dinheiro (sangria para o banco) | Banco | Caixa físico |
-| Quebra de caixa (contado < esperado) | Quebra de caixa | Caixa físico |
-| Sobra de caixa | Caixa físico | Receita/Outras (ou passivo a apurar) |
+| Fechamento do caixa 3: devolve fundo + venda em dinheiro (contado) | Tesouraria (contado) | Caixa bilheteria 3 (contado) |
+| Quebra de caixa (contado < esperado) | Quebra de caixa | Caixa bilheteria N |
+| Sobra de caixa | Caixa bilheteria N | Receita/Outras (ou passivo a apurar) |
+| Sangria para depósito bancário | Banco | Tesouraria |
+| Sangria para pagar despesa do evento (com comprovante) | Despesa correspondente (5.9.xx) | Tesouraria |
 | Comissão loja do dia (vendas 1.234,56 × 15%) | A receber loja N 185,18 | Receita comissão foods 185,18 |
 | Repasse da loja (FIFO) | Banco / Caixa | A receber loja N (excedente em Crédito de loja) |
 | Repasse à administração | Repasses à administração | Banco |
 
 A **taxa da Zet não entra no livro-razão**: é um acréscimo pago pelo cliente e retido pela própria Zet, então nunca passa pelo caixa do evento. Bruto e taxa ficam registrados na venda (`sales.zet_orders`) para conferência. No estorno, o evento devolve só o preço do ingresso (R$ 30,00); a taxa continua sendo assunto entre cliente e Zet e nunca afeta o saldo do evento.
 
-A pergunta "**quanto a Zet ainda me deve?**" passa a ser o **saldo da conta 1.2.01**. "Quanto a loja N deve?" é o saldo da 1.2.1N. "Quanto deveria haver no caixa 3?" é o saldo da 1.1.01-3. **A conciliação vira comparar saldo de conta com extrato.**
+A pergunta "**quanto a Zet ainda me deve?**" passa a ser o **saldo da conta 1.2.01**. "Quanto a loja N deve?" é o saldo da 1.2.1N. "Quanto deveria haver no caixa 3?" é o saldo da 1.1.03 (fundo de troco + vendas em dinheiro − estornos). Depois do fechamento, o saldo do caixa volta a zero e o dinheiro aparece na Tesouraria até a sangria. **A conciliação vira comparar saldo de conta com extrato.**
 
 ### 3.4 DDL
 
@@ -421,14 +428,82 @@ revoke update, delete, truncate on audit.log from public, anon, authenticated, s
 
 ## 4. Fechamento diário no novo modelo
 
-1. Durante o dia, cada fato gera lançamentos (webhook Zet, sessão de caixa, vendas da loja).
-2. No fechamento, o sistema **calcula o esperado** a partir do livro-razão (saldo do Caixa físico por caixa, A receber PagBank do dia, vendas Zet do dia).
-3. O operador **declara o contado** (dinheiro, maquininha, cartões de ingresso restantes).
-4. **Diferença ≠ 0 vira lançamento** (quebra ou sobra), com justificativa obrigatória. Nada de `Math.max(0, …)`.
-5. Assinatura de quem fecha, depois aprovação. `fin.periods.status = 'closed'` e `snapshot_sha256 = sha256(ids e valores dos lançamentos do dia)`.
-6. O PDF e o QR guardam o hash. A verificação recalcula e compara.
-7. Ajuste depois do fechamento é **lançamento em dia aberto** com `metadata.adjusts_business_date`. Reabrir exige admin e motivo (`fin.period_reopenings`).
-8. O **rascunho** do wizard fica em outra tabela (`closure_drafts`) e **nunca** escreve na tabela de períodos.
+1. Durante o dia, cada fato gera lançamentos (webhook Zet, abertura de caixa com fundo de troco, vendas, estornos, vendas da loja).
+2. **Dia operacional**: cada lançamento carrega o seu `business_date`. No online ele vem da data de pagamento em America/Sao_Paulo (virada à meia-noite). Na bilheteria ele vem da **sessão do caixa**: tudo o que é vendido enquanto o caixa está aberto pertence ao dia daquele caixa, mesmo depois da meia-noite.
+3. **Fechamento de cada caixa**: o sistema calcula o esperado (saldo da conta do caixa = fundo + dinheiro − estornos), o operador declara o contado e o caixa devolve tudo à Tesouraria. **Diferença ≠ 0 vira lançamento** (quebra ou sobra), com justificativa obrigatória. Nada de `Math.max(0, …)`.
+4. **Fechamento do dia**: só com os 9 caixas fechados. O sistema gera o resumo e o hash do conteúdo (`fin.day_snapshot`).
+5. **Assinaturas**: as **duas pessoas designadas** assinam o mesmo hash. A designação é uma tabela com vigência (`valid_from`, `valid_to`), trocável a qualquer momento; o banco só aceita assinatura de quem está designado **naquele instante**. Se algum lançamento entrar depois de uma assinatura, o hash muda e a assinatura deixa de valer (é preciso assinar de novo).
+6. `fin.close_period` exige **2 assinantes distintos sobre o mesmo hash** e então trava o dia (`status = 'closed'`). O PDF e o QR guardam o hash, e a verificação recalcula e compara.
+7. **Sangria**: depois do fechamento, lançamento de Tesouraria → Banco (depósito) ou Tesouraria → Despesa (pagamento com comprovante), num dia aberto.
+8. Ajuste depois do fechamento é **lançamento em dia aberto** com `metadata.adjusts_business_date`. Reabrir exige admin e motivo (`fin.period_reopenings`).
+9. O **rascunho** do wizard fica em outra tabela (`closure_drafts`) e **nunca** escreve na tabela de períodos.
+
+```sql
+-- quem pode assinar o fechamento, com vigência (trocável a qualquer momento)
+create table fin.closure_signer_designations (
+  id            bigserial primary key,
+  event_id      uuid not null references public.events(id) on delete restrict,
+  user_id       uuid not null references auth.users(id),
+  valid_from    timestamptz not null default now(),
+  valid_to      timestamptz,
+  designated_by uuid references auth.users(id),
+  check (valid_to is null or valid_to > valid_from)
+);
+
+create table fin.period_signatures (
+  event_id        uuid not null,
+  business_date   date not null,
+  signer_id       uuid not null references auth.users(id),
+  signed_at       timestamptz not null default now(),
+  snapshot_sha256 bytea not null,
+  primary key (event_id, business_date, signer_id, snapshot_sha256),
+  foreign key (event_id, business_date) references fin.periods(event_id, business_date)
+);
+
+-- hash do conteúdo financeiro do dia
+create or replace function fin.day_snapshot(p_event uuid, p_date date) returns bytea
+language sql stable as $$
+  select sha256(convert_to(coalesce(string_agg(
+           e.id::text || ':' || p.account_id || ':' || p.side || ':' || p.amount_cents,
+           '|' order by e.id, p.id), ''), 'UTF8'))
+    from fin.journal_entries e join fin.postings p on p.entry_id = e.id
+   where e.event_id = p_event and e.business_date = p_date
+$$;
+
+-- só assina quem está designado no instante da assinatura
+create or replace function fin.trg_signer_designated() returns trigger
+language plpgsql as $$
+begin
+  if not exists (select 1 from fin.closure_signer_designations d
+                  where d.event_id = new.event_id and d.user_id = new.signer_id
+                    and d.valid_from <= new.signed_at
+                    and (d.valid_to is null or d.valid_to > new.signed_at)) then
+    raise exception 'Usuário % não está designado para assinar o fechamento em %', new.signer_id, new.signed_at;
+  end if;
+  return new;
+end $$;
+create trigger period_signatures_designated before insert on fin.period_signatures
+  for each row execute function fin.trg_signer_designated();
+create trigger period_signatures_no_update before update or delete on fin.period_signatures
+  for each row execute function fin.forbid_mutation();
+
+-- fecha o dia: 2 assinantes distintos sobre o conteúdo atual
+create or replace function fin.close_period(p_event uuid, p_date date) returns bytea
+language plpgsql security definer set search_path = fin, public as $$
+declare v_hash bytea := fin.day_snapshot(p_event, p_date); n int;
+begin
+  select count(distinct signer_id) into n
+    from fin.period_signatures
+   where event_id = p_event and business_date = p_date and snapshot_sha256 = v_hash;
+  if n < 2 then
+    raise exception 'Fechamento de % exige 2 assinaturas distintas sobre o conteúdo atual (tem %)', p_date, n;
+  end if;
+  update fin.periods set status = 'closed', closed_at = now(), closed_by = auth.uid(), snapshot_sha256 = v_hash
+   where event_id = p_event and business_date = p_date and status <> 'closed';
+  if not found then raise exception 'Dia % inexistente ou já fechado', p_date; end if;
+  return v_hash;
+end $$;
+```
 
 ## 5. Conciliação em três pontas
 

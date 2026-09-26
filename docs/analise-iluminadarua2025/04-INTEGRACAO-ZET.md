@@ -225,7 +225,7 @@ stateDiagram-v2
 | CP de pedido novo | Cria `zet_orders` e itens; `fin.post_entry(key='zet:CP:<uuid>')` |
 | CP repetido com **mesmos valores** | Nada (a chave idempotente já existe) |
 | CP repetido com **valores diferentes** | **Não sobrescreve.** Abre `recon.exceptions(kind='amount_mismatch')` para análise humana |
-| ES de pedido PAGO | Status ESTORNADO, vouchers cancelados, `fin.post_entry(key='zet:ES:<uuid>')` |
+| ES de pedido PAGO | Status ESTORNADO, vouchers cancelados, `fin.post_entry(key='zet:ES:<uuid>')` devolvendo **só o preço do ingresso** (a taxa não é estornada pelo evento). Se o ES trouxer só parte dos vouchers, estorna-se a soma de `net_cents` desses vouchers |
 | ES repetido | Nada |
 | ES antes de CP | Exceção. O worker tenta de novo depois (CP pode chegar). Depois de 24 h, alerta |
 | CP depois de ES | Exceção. Nunca reverte o estorno |

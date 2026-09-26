@@ -8,10 +8,11 @@
 - [ ] CSV PagBank do dia importado.
 - [ ] Extrato bancário (OFX) importado até o dia.
 
-**Bilheteria (por caixa)**
-- [ ] Troco inicial registrado na abertura.
+**Bilheteria (cada um dos 9 caixas)**
+- [ ] Fundo de troco entregue e registrado na abertura (Tesouraria → Caixa N).
 - [ ] Cartões de ingresso iniciais e restantes contados.
-- [ ] Dinheiro contado por **duas pessoas**, valor declarado.
+- [ ] Dinheiro contado por **duas pessoas**, valor declarado; fundo de troco devolvido junto com a venda.
+- [ ] Estornos do caixa (sempre totais) registrados com o meio de pagamento.
 - [ ] Total da maquininha (relatório do POS) igual ao total PagBank importado.
 - [ ] Diferença esperado × declarado: se ≠ 0, lançamento de quebra ou sobra **com justificativa**.
 
@@ -30,10 +31,10 @@
 
 **Encerramento**
 - [ ] Revisão do resumo (receitas, despesas, saldo por conta).
-- [ ] Assinatura de quem fecha.
-- [ ] Aprovação por outra pessoa (quem fecha ≠ quem aprova).
+- [ ] Os 9 caixas fechados.
+- [ ] Assinatura das **duas pessoas designadas** (vigentes no momento da assinatura) sobre o mesmo conteúdo.
 - [ ] Dia travado; PDF com hash e QR arquivado.
-- [ ] Depósito do dinheiro agendado ou realizado (lançamento Caixa → Banco).
+- [ ] Sangria registrada: Tesouraria → Banco (depósito) ou Tesouraria → Despesa (com comprovante).
 
 ## B. Segurança para produção
 
