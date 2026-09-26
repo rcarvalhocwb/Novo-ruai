@@ -121,7 +121,7 @@ Foram 2.397 ingressos vendidos em **máquinas da própria Zet**, com tipo `FISIC
 
 **O robô só lê.** No painel existem botões que **mexem em dinheiro e em ingressos**: **Solicitar saque**, **Nova venda** e **Validar** (na Lista de ingressos). O robô:
 - não clica em nada além de navegação, filtros e Exportar, com uma **lista de botões permitidos** no código;
-- **nunca** valida ingresso. A "baixa" dos validados é feita **no nosso sistema**, lendo a coluna "data de uso" da Lista de ingressos, e não no painel da Zet. Validar um voucher pelo robô registraria como presente uma pessoa que não entrou;
+- **nunca** valida ingresso nem altera nada no painel da Zet (regra R27, confirmada pelo dono do evento). A "baixa" dos validados é feita **no nosso sistema**, lendo a coluna "data de uso" da Lista de ingressos, e não no painel da Zet. Validar um voucher pelo robô registraria como presente uma pessoa que não entrou;
 - aborta se a página mostrar um formulário ou uma confirmação inesperada.
 
 **Conta do robô:** o vídeo foi feito com a conta do dono do evento, que pode solicitar saque. Um robô com essa senha poderia sacar dinheiro, se tivesse um erro ou fosse invadido. **Pedir à Zet um usuário só de leitura**, sem saque, sem nova venda e sem validação, antes de colocar o robô em produção. Enquanto isso não existir, o robô roda apenas manualmente, acompanhado.

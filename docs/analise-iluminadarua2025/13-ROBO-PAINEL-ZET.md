@@ -68,7 +68,8 @@ Em qualquer das duas, **provar que leu tudo**:
 | Pedido **só no sistema** | Exceção "venda sem confirmação da Zet" (possível envio falso, como o teste do Postman que entrou como venda real) |
 | Estorno no painel sem webhook ES | Aplica o estorno (por voucher) com origem `zet_panel` |
 | Valor ou taxa diferente | Exceção para análise; **nunca** sobrescreve sozinho (lembrando o caso da taxa errada da meia-entrada) |
-| Voucher validado no borderô | Preenche `used_at` e `used_source = 'zet_bordero'` |
+| Voucher validado na Zet e não no nosso sistema | Ajusta **só o nosso sistema**: preenche `used_at` com a data de uso da Zet e `used_source = 'zet_painel'` (regra R27) |
+| Voucher validado no nosso sistema e não na Zet | Exceção para análise; **nada** é alterado na Zet |
 
 3. O painel **complementa** o webhook, não o substitui: o webhook continua sendo o registro em tempo real; o robô é a conferência diária e a rede de segurança.
 

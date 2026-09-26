@@ -127,7 +127,7 @@ alter table sales.zet_order_items
   add column sold_on        date,        -- dia operacional do pagamento
   add column refunded_on    date,        -- dia operacional do estorno
   add column used_at        timestamptz, -- validação (borderô ou catraca)
-  add column used_source    text check (used_source in ('zet_bordero','catraca','zet_api'));
+  add column used_source    text check (used_source in ('zet_painel','zet_bordero','catraca','zet_api'));
 
 -- borderô importado (por voucher quando a Zet fornecer; senão, por tipo)
 create table recon.zet_bordero_lines (
