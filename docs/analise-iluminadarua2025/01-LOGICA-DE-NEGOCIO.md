@@ -160,7 +160,7 @@ O manual antigo (passo 3.6) fala em "pagar comissões de lojas" como despesa e e
 | R16 | Descontos só existem em **campanhas** e reduzem a receita do ingresso. O `totalValue` da Zet já vem com o desconto; `discount` é só informativo. |
 | R17 | Tolerâncias do fechamento por guichê: até R$ 1,00 justificativa opcional; R$ 1,01 a R$ 50,00 obrigatória; acima de R$ 50,00 destaque para os assinantes. **Editáveis por evento.** |
 | R18 | Cada guichê tem a sua maquininha PagBank (a maioria Smart); no fechamento do guichê não fica dinheiro na gaveta. Pode haver **sangria parcial durante o dia**, registrada na hora, com quem entregou e quem recebeu. |
-| R19 | A catraca concilia as vendas: cada entrada deve corresponder a um ingresso pago; a conferência é por ingresso, por tipo e depois por valor (preço de cada tipo). |
+| R19 | **O fechamento segue o dinheiro**: vendas pela data do pagamento, estornos pela data do estorno, recebimentos pela data do crédito. A catraca controla **pessoas** (entrada sem ingresso, tipo, comparecimento) e **nunca** vira valor no caixa. Receita por data de visita é só relatório contábil. Ver `11-VENDA-X-ENTRADA.md`. |
 | R13 | Divergência de catraca: alerta acima de 5%, crítico acima de 10%; mais de 20 entradas de diferença é suspeita de fraude. |
 
 ## 4. Modelo de dados atual (resumo)

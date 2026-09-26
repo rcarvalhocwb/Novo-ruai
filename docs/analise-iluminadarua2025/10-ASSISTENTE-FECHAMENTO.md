@@ -185,7 +185,7 @@ Estratégia recomendada, já que nem todas são Smart:
 2. **Depois, aplicativo nas Smart**: os guichês com Smart passam a registrar venda + pagamento em tempo real. A API EDI continua rodando por baixo como conferência (o que o app registrou tem de bater com o que o PagBank liquidou).
 3. **Guichês sem Smart** seguem com o fluxo manual + EDI. Se possível, trocar essas maquininhas por Smart com o tempo, para padronizar os 9 guichês.
 
-## 8. Conciliação com a catraca
+## 8. Conciliação com a catraca (controle de pessoas, não de dinheiro)
 
 A ideia de usar a catraca para conferir as vendas está certa: **toda entrada tem de corresponder a um ingresso pago** (ou a uma cortesia registrada). Mas multiplicar o número de acessos por um valor médio dá uma conta fraca, porque:
 - a catraca não sabe o preço: há inteira, meia (R$ 18), solidário (R$ 25), Gazeta e cortesias no mesmo giro;
@@ -200,9 +200,9 @@ A ideia de usar a catraca para conferir as vendas está certa: **toda entrada te
 |---|---|---|
 | 1. Por ingresso | Cada passagem autorizada corresponde a um cartão RFID vendido naquele dia ou a um voucher válido para aquela data | Passagem sem ingresso = alerta (possível fraude ou cartão não devolvido) |
 | 2. Por tipo (bilheteria) | Entradas por tipo × cartões vendidos por tipo nos 9 guichês | Iguais, descontadas as reentradas |
-| 3. Por valor (bilheteria) | Σ (entradas por tipo × preço do tipo) × receita dos 9 guichês (dinheiro + cartão + PIX) | Igual; a diferença aponta tipo errado (meia vendida como inteira) ou venda sem registro |
+| 3. Por valor (**só bilheteria**, informativo) | Σ (entradas RFID por tipo × preço do tipo) × receita dos 9 guichês (dinheiro + cartão + PIX) | Igual; a diferença aponta tipo errado (meia vendida como inteira) ou venda sem registro |
 | 4. Online por data de visita | Vouchers usados no dia × vouchers com visita no dia | Não comparecimento é normal; entrada sem voucher válido, não |
 
-O valor estimado pela catraca (nível 3) continua existindo, como você propôs, mas calculado **com o preço de cada tipo**, e não com um valor médio, e só depois de bater as quantidades. Assim, quando o valor não bate, o sistema já sabe se o problema é quantidade (alguém entrou sem pagar) ou preço (tipo errado).
+**Importante (ver `11-VENDA-X-ENTRADA.md`)**: a catraca é um controle **de pessoas**, não de dinheiro. O nível 3 vale **só para a bilheteria**, porque ali a compra e a entrada acontecem no mesmo dia; e mesmo assim é uma conferência que gera alerta, **nunca** um valor que entra ou sai do caixa. No online, 39% dos ingressos são usados em outro dia, então entradas online **nunca** são convertidas em valor no fechamento.
 
 Alertas mantidos: divergência de quantidade acima de 5% = alerta; acima de 10% = crítico.

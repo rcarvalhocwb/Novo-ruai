@@ -28,8 +28,10 @@
 - [ ] Repasse de cada loja registrado pelo valor **efetivamente recebido**; alocado FIFO; excedente em crédito da loja.
 - [ ] Lojas com **falta de repasse** (pagaram menos) listadas com valor e dias em aberto, para cobrança no próximo caixa.
 
-**Catraca**
-- [ ] Entradas × ingressos válidos do dia; divergência acima de 5% justificada.
+**Catraca (controle de pessoas; não entra no valor do caixa)**
+- [ ] Nenhuma entrada sem ingresso válido para a data (cartão RFID vendido no dia ou voucher com visita no dia).
+- [ ] Bilheteria: entradas por tipo × cartões vendidos por tipo; divergência acima de 5% justificada.
+- [ ] Online: comparecimento do dia registrado (usados × com visita no dia).
 
 **Encerramento**
 - [ ] Revisão do resumo (receitas, despesas, saldo por conta).

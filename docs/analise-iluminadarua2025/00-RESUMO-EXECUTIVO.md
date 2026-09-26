@@ -88,4 +88,5 @@ Os fatores do código que transformaram uma queda de infraestrutura em perda de 
 | `07-CHECKLISTS.md` | Checklist de fechamento financeiro e de segurança para produção |
 | `08-DUVIDAS.md` | Perguntas que só você pode responder |
 | `10-ASSISTENTE-FECHAMENTO.md` | Assistente de fechamento da bilheteria: problemas do atual e desenho por guichê, com tolerâncias |
+| `11-VENDA-X-ENTRADA.md` | Por que o fechamento segue o dinheiro e não a catraca: três visões (caixa, acesso, competência) |
 | `09-ANALISE-WEBHOOKS-ZET.md` | Análise dos 27.641 webhooks do backup: totais, 199 vendas nunca gravadas, segurança |
