@@ -10,7 +10,7 @@
 
 **Bilheteria (cada um dos 9 caixas)**
 - [ ] Fundo de troco entregue e registrado na abertura, com o operador e o valor dele (Tesouraria → Caixa N).
-- [ ] Cartões de ingresso iniciais e restantes contados.
+- [ ] *(Só no modo "por guichê")* cartões de ingresso iniciais e restantes contados por tipo.
 - [ ] Dinheiro contado por **duas pessoas**, valor declarado; fundo de troco devolvido junto com a venda.
 - [ ] Estornos do caixa (sempre totais) registrados com o meio de pagamento.
 - [ ] Sangrias parciais do dia registradas na hora (quem entregou, quem recebeu, valor).
@@ -31,7 +31,7 @@
 
 **Catraca (controle de pessoas; não entra no valor do caixa)**
 - [ ] Nenhuma entrada sem ingresso válido para a data (cartão RFID vendido no dia ou voucher com visita no dia).
-- [ ] Bilheteria: entradas por tipo × cartões vendidos por tipo; divergência acima de 5% justificada.
+- [ ] Bilheteria (total dos 9 guichês): receita somada dos guichês × entradas RFID por tipo × preço; divergência acima de 5% justificada. No modo "por guichê", também cartões vendidos por tipo × entradas.
 - [ ] Online (pelo borderô): entradas do dia, divididas em compradas hoje × antes; ingressos com visita hoje não utilizados listados.
 
 **Encerramento**

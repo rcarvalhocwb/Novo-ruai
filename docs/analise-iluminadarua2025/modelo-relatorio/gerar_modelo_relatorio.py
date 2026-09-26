@@ -226,7 +226,8 @@ cc_saldo = cc_devido - cc["repasses"] - cc["taxas_saque"]
 cc_risco = 9_874_500
 
 snapshot = dict(dia=DIA, guiches=guiche_rows, online=dict(liq=on_liq, est=on_est, cb=on_cb, maq=maq_liq, desc=desc_liq),
-                foods=food_rows, tesouraria=dict(deposito=deposito, despesa=despesa), publico=dict(bil=bil_entr, on=on_ent))
+                foods=food_rows, tesouraria=dict(deposito=deposito, despesa=despesa), publico=dict(bil=bil_entr, on=on_ent),
+                catraca=dict(entradas=bil_entr_q, esperado=val_bil_entr, receita=bil_venda - bil_est))
 HASH = hashlib.sha256(json.dumps(snapshot, sort_keys=True, default=str).encode()).hexdigest()
 
 
@@ -348,17 +349,18 @@ def build(out):
 
     # 1. bilheteria
     s.append(P("1. Bilheteria por guichê", S_H1))
-    data = [[H("Guichê"), HR("Fundo de troco"), HR("Ingressos"), HR("Venda"), HR("Dinheiro"), HR("Débito"),
+    data = [[H("Guichê"), HR("Fundo de troco"), HR("Venda"), HR("Dinheiro"), HR("Débito"),
              HR("Crédito"), HR("PIX"), HR("Estornos"), HR("Sangrias no dia")]]
     for r in guiche_rows:
-        data.append([P(f"Guichê {r['g']}"), R(brl(r["fundo"])), R(num(sum(r["q"]))), R(brl(r["venda"])),
+        data.append([P(f"Guichê {r['g']}"), R(brl(r["fundo"])), R(brl(r["venda"])),
                      R(brl(r["din"])), R(brl(r["deb"])), R(brl(r["cred"])), R(brl(r["pix"])),
                      R(brl(-r["est"]) if r["est"] else "—"), R(brl(r["sang"]))])
-    data.append([B("Total"), RB(brl(bil_fundos)), RB(num(bil_ing)), RB(brl(bil_venda)), RB(brl(bil_din)),
+    data.append([B("Total"), RB(brl(bil_fundos)), RB(brl(bil_venda)), RB(brl(bil_din)),
                  RB(brl(bil_deb)), RB(brl(bil_cred)), RB(brl(bil_pix)), RB(brl(-bil_est)), RB(brl(bil_sang_parc))])
-    s.append(table(data, [W * x for x in (.08, .095, .085, .11, .11, .105, .105, .11, .09, .11)], total_rows=1))
+    s.append(table(data, [W * x for x in (.09, .105, .115, .11, .11, .11, .115, .10, .145)], total_rows=1))
     s.append(Spacer(1, 3))
-    s.append(P("Cartão e PIX são das maquininhas PagBank de cada guichê. Os estornos da bilheteria são sempre totais e registrados com o meio de pagamento.", S_SMALL))
+    s.append(P("Cartão e PIX são das maquininhas PagBank de cada guichê. Os estornos da bilheteria são sempre totais e registrados com o meio de pagamento. "
+               "Cada guichê fecha o <b>dinheiro</b> e a <b>maquininha</b>; os ingressos são conferidos no total da bilheteria (seção 1.2).", S_SMALL))
 
     s.append(P("Conferência do dinheiro de cada guichê", S_H2))
     data = [[H("Guichê"), HR("Fundo + dinheiro − estornos − sangrias"), HR("Esperado na gaveta"), HR("Contado"),
@@ -374,6 +376,25 @@ def build(out):
     s.append(Spacer(1, 3))
     s.append(P("Tolerância (configurável por evento): até R$ 1,00 conciliado, justificativa opcional · de R$ 1,01 a R$ 50,00 justificativa obrigatória · "
                "acima de R$ 50,00 destacado para os assinantes. Quebra e sobra viram lançamento contábil, nunca são apagadas.", S_SMALL))
+
+    # 1.2 bilheteria x catraca (total dos 9 guichês)
+    s.append(P("1.2 Bilheteria × catraca (total dos 9 guichês)", S_H2))
+    data = [[H("Tipo do cartão RFID"), HR("Entradas (cartões distintos)"), HR("Preço"), HR("Valor esperado")]]
+    for t, n in zip(TIPOS, bil_entr_q):
+        data.append([P(t), R(num(n)), R(brl(PRECO[t])), R(brl(n * PRECO[t]))])
+    data.append([B("Esperado pela catraca"), RB(num(bil_entr)), R(""), RB(brl(val_bil_entr))])
+    rec_bil = bil_venda - bil_est
+    dif_cat = rec_bil - val_bil_entr
+    data.append([B("Receita dos 9 guichês (venda − estornos)"), R(""), R(""), RB(brl(rec_bil))])
+    data.append([B("Diferença"), R(""), R(""),
+                 P(f'<b>{brl(dif_cat, sign=True)}</b> ({pct(abs(dif_cat), val_bil_entr)}) · <font color="{OK.hexval()}"><b>OK</b></font>', S_CELL_R)])
+    s.append(table(data, [W * x for x in (.40, .22, .16, .22)], total_rows=3))
+    s.append(Spacer(1, 3))
+    s.append(P("Hoje não há controle de quantos ingressos cada guichê vendeu, por isso a conferência é da <b>bilheteria inteira</b>: a soma dos 9 guichês "
+               "tem de bater com as entradas RFID do dia × preço do tipo (reentrada do mesmo cartão conta uma vez). Diferença positiva pequena é normal "
+               "(cartão vendido que ainda não passou); acima de 5% é alerta e acima de 10% é crítico. É uma conferência: o valor do caixa é sempre o contado "
+               "e o da maquininha. <b>Modo opcional \"por guichê\"</b>: se o evento controlar os cartões entregues a cada guichê, esta tabela aparece também "
+               "em cada guichê, junto com a coluna de ingressos vendidos.", S_SMALL))
 
     # 2. online
     s.append(P("2. Vendas online e na máquina da Zet", S_H1))
@@ -431,7 +452,7 @@ def build(out):
     s.append(Spacer(1, 3))
     s.append(P(f"Online com visita marcada para hoje: {num(on_previstos)} ingressos · validados {num(on_ent)} · <b>não validados {num(on_nao_valid)}</b> "
                f"(não compareceu ou falha de validação; o valor continua sendo do evento). "
-               f"Bilheteria: {num(bil_ing)} cartões vendidos, {num(bil_entr)} entradas na catraca ({num(bil_ing - bil_entr)} cartões vendidos não passaram, {pct(bil_ing - bil_entr, bil_ing)}; limite de alerta 5%).", S_SMALL))
+               f"Bilheteria: {num(bil_entr)} cartões RFID distintos passaram na catraca; a conferência com a receita dos guichês está na seção 1.2.", S_SMALL))
 
     s.append(P("6. Ticket médio (sobre quem entrou)", S_H1))
     data = [[H("Indicador"), HR("Valor pago pelos ingressos de quem entrou"), HR("Pessoas"), HR("Ticket médio"), HR("Sem cortesias")],
@@ -444,12 +465,12 @@ def build(out):
     s.append(P("Mix de quem entrou: " + " · ".join(f"{t} {pct(n, sum(tot_ent))}" for t, n in zip(TIPOS, tot_ent)) +
                ". A venda média do dia (líquido vendido ÷ ingressos vendidos) é um indicador comercial separado e não substitui o ticket médio.", S_SMALL))
 
-    s.append(P("Previsão dos próximos dias (ingressos online já vendidos)", S_H2))
+    prev_head = P("Previsão dos próximos dias (ingressos online já vendidos)", S_H2)
     data = [[H("Data da visita"), HR("Já vendidos"), HR("Comparecimento histórico"), HR("Estimativa online")],
             [P("21/12/2025 (domingo)"), R("890"), R("94,2%"), R("838")],
             [P("22/12/2025 (segunda)"), R("577"), R("94,2%"), R("544")],
             [P("23/12/2025 (terça)"), R("403"), R("94,2%"), R("380")]]
-    s.append(table(data, [W * x for x in (.34, .2, .24, .22)]))
+    s.append(KeepTogether([prev_head, table(data, [W * x for x in (.34, .2, .24, .22)])]))
 
     # 7. conciliações
     s.append(P("7. Conciliações e pontos de atenção", S_H1))
@@ -462,7 +483,7 @@ def build(out):
             [P("Guichê 4: diferença de −R$ 12,00"), P(JUSTIFICATIVAS[4]), status_chip("Justificar")],
             [P("Guichê 7: sobra de +R$ 63,00"), P(JUSTIFICATIVAS[7]), status_chip("Destacar")],
             [P("Loja 03: falta de repasse"), P("Pagou R$ 45,30 a menos hoje; R$ 143,30 em aberto com os dias anteriores. Cobrar no próximo caixa."), status_chip("Alerta")],
-            [P("Catraca × cartões vendidos na bilheteria"), P(f"{num(bil_ing - bil_entr)} cartões sem entrada ({pct(bil_ing - bil_entr, bil_ing)}), abaixo do limite de 5%"), status_chip("OK")]]
+            [P("Bilheteria × catraca (total dos 9 guichês)"), P(f"Receita dos guichês {brl(bil_venda - bil_est)} × esperado pela catraca {brl(val_bil_entr)}: diferença {brl(bil_venda - bil_est - val_bil_entr, sign=True)} ({pct(abs(bil_venda - bil_est - val_bil_entr), val_bil_entr)}), abaixo do limite de 5%"), status_chip("OK")]]
     s.append(table(data, [W * .36, W * .50, W * .14]))
 
     # 8. conta-corrente Zet
@@ -512,7 +533,7 @@ def build(out):
         "Todas as contas são feitas pelo sistema, em centavos. O assistente de IA só orienta, não calcula nem grava valores.",
         "Online entra pelo valor líquido do evento (a taxa de 10% é da Zet). O estorno devolve só o ingresso.",
         "Entram duas fontes que o sistema antigo não via: vendas na máquina da Zet e contestações (chargeback e devolução PIX), trazidas pelo robô.",
-        "Cada guichê fecha separado, com fundo de troco por operador e sangrias registradas na hora. A tesouraria termina o dia zerada.",
+        "Cada guichê fecha separado o dinheiro e a maquininha, com fundo de troco por operador e sangrias registradas na hora. Os ingressos são conferidos no total da bilheteria × catraca. A tesouraria termina o dia zerada.",
         "Falta de repasse das lojas fica em aberto e aparece todo dia até ser paga.",
         "Ticket médio calculado sobre quem entrou, com e sem cortesias; a venda média do dia fica como indicador comercial à parte.",
         "Duas assinaturas das pessoas designadas no momento, sobre o mesmo conteúdo. Depois disso o dia não muda.",
@@ -523,7 +544,8 @@ def build(out):
     itens = [
         "Ordem e conteúdo das seções 1 a 9.",
         "Tolerâncias: até R$ 1,00 / R$ 1,01 a R$ 50,00 / acima de R$ 50,00 (valores configuráveis).",
-        "Limite de 5% para cartões da bilheteria vendidos sem entrada na catraca.",
+        "Conferência dos ingressos da bilheteria no total dos 9 guichês × catraca (padrão), ou também por guichê (opcional, exige controle dos cartões entregues a cada guichê).",
+        "Limites da conferência bilheteria × catraca: alerta acima de 5%, crítico acima de 10%.",
         "Online marcado como parcial no fechamento dos caixas e completado pela sincronização da madrugada.",
         "Vendas descobertas depois do fechamento entram como ajuste no dia seguinte, sem reabrir o dia.",
         "Vendas na máquina da Zet: mostradas na seção 2 ou também dentro do guichê que operou a máquina?",
