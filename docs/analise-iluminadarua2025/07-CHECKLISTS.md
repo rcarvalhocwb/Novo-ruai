@@ -5,7 +5,7 @@
 **Antes de abrir o wizard**
 - [ ] Todos os webhooks Zet do dia processados (fila vazia, nenhum `failed` ou `dead`).
 - [ ] Relatório Zet de D−1 importado e conciliado (diferença R$ 0,00 ou exceções com responsável).
-- [ ] CSV PagBank do dia importado.
+- [ ] Vendas das maquininhas do dia anterior importadas pela API EDI do PagBank (D+1) e conferidas por guichê.
 - [ ] Extrato bancário (OFX) importado até o dia.
 
 **Bilheteria (cada um dos 9 caixas)**
@@ -13,6 +13,7 @@
 - [ ] Cartões de ingresso iniciais e restantes contados.
 - [ ] Dinheiro contado por **duas pessoas**, valor declarado; fundo de troco devolvido junto com a venda.
 - [ ] Estornos do caixa (sempre totais) registrados com o meio de pagamento.
+- [ ] Sangrias parciais do dia registradas na hora (quem entregou, quem recebeu, valor).
 - [ ] Total da maquininha (relatório do POS) igual ao total PagBank importado.
 - [ ] Diferença esperado × declarado: se ≠ 0, lançamento de quebra ou sobra **com justificativa**.
 

@@ -46,6 +46,14 @@ Cada guichê fecha **separadamente**, na sessão do seu operador. O fechamento d
 - **Receita esperada pelos ingressos** = Σ (cartões vendidos × preço da categoria) + produtos.
 - Essa receita tem de ser igual a **dinheiro + cartão + PIX** do guichê. Se não bater, há ingresso vendido sem registro de pagamento, pagamento sem ingresso, ou cortesia não lançada.
 
+### Sangria parcial (durante o dia, registrada na hora)
+Quando o guichê acumula dinheiro, pode haver retirada antes do fechamento. Ela é registrada **no momento da retirada**:
+- valor contado, quem entregou (operador) e quem recebeu (tesouraria), com confirmação das duas pessoas no sistema;
+- gera o lançamento Caixa do guichê → Tesouraria na hora, então o "dinheiro esperado na gaveta" já desconta a retirada automaticamente;
+- opcionalmente, recibo impresso ou foto do envelope lacrado.
+
+Sangria que não foi registrada aparece como falta no fechamento. É exatamente a hipótese que o assistente sugere primeiro nesse caso.
+
 ### Etapa 4: contagem física
 - Contagem por cédula e moeda (a soma é calculada pelo sistema) e foto da contagem e do relatório da maquininha, guardadas com hash e vinculadas à sessão.
 
@@ -170,7 +178,12 @@ Como isso se encaixa no fechamento:
 
 Cadastro: tabela de maquininhas (`número de série → guichê`, com vigência, porque uma maquininha pode trocar de guichê).
 
-**Opção futura (tempo real)**: as maquininhas PagBank Smart (Android) aceitam um aplicativo próprio via SDK de integração do PagBank. Com ele, a **venda do ingresso e o pagamento acontecem no mesmo terminal**: o sistema registra cada venda, com o tipo de ingresso e o meio de pagamento, na hora. Isso elimina a digitação e a conferência de cartão no fechamento. É um projeto maior; vale avaliar depois que o núcleo estiver pronto.
+**Tempo real nas maquininhas Smart (a maioria do parque, confirmado)**: as maquininhas PagBank Smart (Android) aceitam um aplicativo próprio via SDK de integração do PagBank. Com ele, a **venda do ingresso e o pagamento acontecem no mesmo terminal**: o sistema registra cada venda, com o tipo de ingresso e o meio de pagamento, na hora. Isso elimina a digitação e a conferência de cartão no fechamento.
+
+Estratégia recomendada, já que nem todas são Smart:
+1. **Primeiro, API EDI para todas** as maquininhas (Smart ou não): uma única forma de conferência, com a taxa real, em D+1. Resolve a conciliação de cartão já na primeira versão.
+2. **Depois, aplicativo nas Smart**: os guichês com Smart passam a registrar venda + pagamento em tempo real. A API EDI continua rodando por baixo como conferência (o que o app registrou tem de bater com o que o PagBank liquidou).
+3. **Guichês sem Smart** seguem com o fluxo manual + EDI. Se possível, trocar essas maquininhas por Smart com o tempo, para padronizar os 9 guichês.
 
 ## 8. Conciliação com a catraca
 

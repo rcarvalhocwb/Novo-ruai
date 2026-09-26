@@ -161,6 +161,7 @@ No SQL, a mesma regra: `(amount_cents * bps + 5000) / 10000` em `bigint`.
 | Abertura do caixa 3 com fundo de troco de 200,00 | Caixa bilheteria 3 200,00 | Tesouraria 200,00 |
 | Venda bilheteria em dinheiro | Caixa bilheteria N | Receita bilheteria |
 | Estorno na bilheteria (sempre total), em dinheiro | Estornos da bilheteria | Caixa bilheteria N |
+| Sangria parcial durante o dia (registrada na hora) | Tesouraria | Caixa bilheteria N |
 | Estorno na bilheteria, em cartão/PIX | Estornos da bilheteria | A receber PagBank |
 | Venda bilheteria em cartão, bruto 100,00, MDR real 3,08 | A receber PagBank 96,92 · Taxa PagBank 3,08 | Receita bilheteria 100,00 |
 | Liquidação PagBank | Banco | A receber PagBank |

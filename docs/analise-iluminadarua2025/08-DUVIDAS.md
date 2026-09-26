@@ -17,8 +17,8 @@ A análise marcou como **[DÚVIDA]** tudo o que o código não permite afirmar. 
 10. ~~**Contas bancárias**~~ **Respondida:** cadastradas e alteradas durante o evento, com transferência entre contas. *Observação:* se alguma conta for de pessoa física (o código antigo cita `fabio`), convém registrar o titular para a prestação de contas.
 
 25. ~~Tolerâncias~~ **Respondida:** valores aprovados, editáveis numa tela de configuração do evento.
-26. ~~Dinheiro no guichê~~ **Respondida:** no fechamento não fica dinheiro no guichê. *Ainda a confirmar:* há retirada de dinheiro **durante** o dia (antes do fechamento)? Se houver, o sistema tem a sangria parcial registrada na hora.
-27. ~~Maquininhas~~ **Respondida:** uma por guichê. *Próximo passo:* pedir ao PagBank o **token da API do Extrato EDI** (importação automática em D+1) e informar se as maquininhas são do modelo Smart (Android), o que permitiria integração em tempo real.
+26. ~~Dinheiro no guichê~~ **Respondida:** no fechamento não fica dinheiro no guichê. Pode haver sangria **durante** o dia; ela é registrada na hora.
+27. ~~Maquininhas~~ **Respondida:** uma por guichê. *Próximo passo:* pedir ao PagBank o **token da API do Extrato EDI** (importação automática em D+1) A maioria das maquininhas é Smart: plano em duas etapas (API EDI para todas; depois app em tempo real nas Smart).
 
 ## Para a Zet (técnico)
 
