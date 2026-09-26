@@ -24,11 +24,11 @@ flowchart LR
 
 | Cuidado | Por quê | O que fazer |
 |---|---|---|
-| **Autorização da Zet** | O painel não ter bloqueio técnico não significa que o uso automatizado é permitido. Os termos de uso podem proibir, e um bloqueio da conta no meio do evento seria grave. | Avisar a Zet e pedir **autorização por escrito**. Aproveitar para pedir export/API oficial (a melhor solução). |
-| **Credenciais** | O robô entra com usuário e senha de um painel que mostra dinheiro e dados de clientes. | Usuário **exclusivo do robô**, só leitura, se a Zet permitir; senha no cofre de segredos; nunca no código nem em planilha. Se houver 2FA, tratar com a Zet. |
+| **Autorização da Zet** | ✅ **Confirmada**: a Zet autorizou e forneceu login e senha de teste. | Guardar a autorização (e-mail) junto da documentação do evento. Continuar pedindo export/API oficial, que é a solução mais robusta. |
+| **Credenciais** | O robô entra com usuário e senha de um painel que mostra dinheiro e dados de clientes. | Login de teste já fornecido. Guardar **só** como segredo do ambiente (`ZET_PANEL_URL`, `ZET_PANEL_USER`, `ZET_PANEL_PASSWORD`), nunca no código, no repositório, em planilha ou em mensagem. Em produção, usuário exclusivo do robô, só leitura. |
 | **Carga no site da Zet** | Depois do incidente, não podemos ser a causa de um problema do outro lado. | 1 execução por dia (madrugada) + execuções manuais; poucas páginas por minuto; sem paralelismo agressivo. |
 | **LGPD** | O painel tem nome, CPF, e-mail e telefone. | Trazer só os campos necessários para conciliar; dados pessoais guardados com acesso restrito e prazo de retenção definido. |
-| **Fragilidade** | Se a Zet mudar o layout, o robô quebra. | Preferir os **botões de exportar** (CSV/Excel) a ler HTML; validar o formato a cada execução; se algo mudar, **falhar e alertar**, nunca importar dado pela metade. |
+| **Fragilidade** | Se a Zet mudar o layout, o robô quebra. | As vendas **não têm botão de exportar** (confirmado): aparecem numa listagem. Ver a seção 3a. Validar o formato a cada execução; se algo mudar, **falhar e alertar**, nunca importar dado pela metade. |
 | **Evidência** | Para cobrar a Zet, é preciso provar o que o painel mostrava. | Guardar cada arquivo baixado (ou a página) com data, hora e hash, em armazenamento imutável. |
 
 ## 3. O que o robô traz, por página do painel
@@ -42,6 +42,18 @@ flowchart LR
 | Outros relatórios (por sessão, por tipo) | Conferência cruzada e previsão de público |
 
 A lista final depende das páginas e exportações que existem no painel (ver perguntas na seção 6).
+
+## 3a. Como ler a listagem de vendas (sem exportação)
+
+Duas técnicas, nesta ordem de preferência:
+
+1. **Capturar os dados que a própria página carrega.** Painéis modernos buscam a listagem num endpoint interno em JSON e só depois desenham a tabela. O robô abre a página logado e **registra essas respostas JSON** (pelo navegador automatizado), em vez de ler o HTML. Vantagens: vem com todos os campos (inclusive o `uuid`, se existir), não depende do layout e não erra na leitura de valores formatados ("R$ 1.234,56").
+2. **Ler a tabela da página** (se não houver JSON): percorrer todas as páginas da listagem (ou filtrar por dia), ler linha a linha e converter valores com o `parseBRL` de `money.ts`.
+
+Em qualquer das duas, **provar que leu tudo**:
+- comparar a quantidade de linhas lidas com o total que o painel mostra (ex.: "1.234 pedidos"), e a soma dos valores com o total da página, se houver;
+- ler por **janela de data** (dia a dia), para que cada execução seja pequena e repetível;
+- se a contagem não bater, a importação daquele dia é **descartada** e gera alerta; nada entra pela metade.
 
 ## 4. Como o sistema usa o que o robô traz
 
@@ -65,10 +77,16 @@ A lista final depende das páginas e exportações que existem no painel (ver pe
 - Fluxo: login → navega até cada relatório → exporta ou lê → salva os arquivos com hash → envia para uma função de importação autenticada (com papel próprio de "importador").
 - Monitoramento: alerta se o robô não rodar, se o login falhar, se o formato mudar ou se a conciliação encontrar mais de N divergências.
 
-## 6. Perguntas para montar o robô
+## 6. Próximos passos
 
-1. Quais páginas e relatórios existem no painel (vendas, estornos, borderô, financeiro/repasses)? Algum tem **botão de exportar** (CSV/Excel/PDF)?
+1. Cadastrar as credenciais de teste como **segredos do ambiente** (`ZET_PANEL_URL`, `ZET_PANEL_USER`, `ZET_PANEL_PASSWORD`). Nunca enviar senha por mensagem.
+2. Com os segredos, fazer um **mapeamento só de leitura** do painel: telas, filtros, paginação e se a listagem vem de um endpoint JSON.
+3. Escrever o robô e testá-lo contra o backup de webhooks (22/10/2025 a 04/01/2026): o painel tem de mostrar os mesmos 26.111 pedidos e os mesmos valores, mais os que o webhook perdeu.
+
+## 7. Perguntas ainda abertas
+
+1. ~~Exportação das vendas~~ Não há: listagem para ler (seção 3a). Os outros relatórios (borderô, financeiro) têm exportação?
 2. O login tem captcha ou verificação em duas etapas?
-3. É possível criar um **usuário só de leitura** para o robô?
-4. A Zet autoriza o acesso automatizado? (Pedir por escrito; e, junto, perguntar se há API oficial.)
-5. O painel mostra o pedido com o mesmo `uuid` do webhook, ou só o número do pedido?
+3. Em produção, haverá um **usuário só de leitura** para o robô?
+4. ~~Autorização~~ Confirmada.
+5. O painel mostra o pedido com o mesmo `uuid` do webhook, ou só o número do pedido? (O mapeamento do passo 2 responde.)

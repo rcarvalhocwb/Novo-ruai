@@ -33,7 +33,7 @@ A análise marcou como **[DÚVIDA]** tudo o que o código não permite afirmar. 
 17b. Qual é a **política de cancelamento/estorno** da Zet (até quando o cliente pode pedir), e por quanto tempo a Zet retém valores por causa de chargeback? Quem arca com chargeback?
 17c. Qual é a **agenda de repasses** (D+quanto, por lote de vendas) e existe relatório da composição de cada repasse?
 
-17d. **Robô no painel:** a Zet autoriza acesso automatizado ao painel administrativo (por escrito)? Dá para ter um usuário só de leitura? Quais relatórios têm exportação? O login tem captcha ou 2FA? (Ver `13-ROBO-PAINEL-ZET.md`.)
+17d. **Robô no painel:** ~~autorização~~ confirmada, com login de teste. Vendas não têm exportação (listagem). *Abertos:* captcha/2FA no login; usuário só de leitura em produção; se outros relatórios exportam. (Ver `13-ROBO-PAINEL-ZET.md`.)
 
 ## Sobre o incidente
 
