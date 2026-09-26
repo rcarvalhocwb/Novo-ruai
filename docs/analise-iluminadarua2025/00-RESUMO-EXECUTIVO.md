@@ -90,6 +90,7 @@ Os fatores do código que transformaram uma queda de infraestrutura em perda de 
 | `10-ASSISTENTE-FECHAMENTO.md` | Assistente de fechamento da bilheteria: problemas do atual e desenho por guichê, com tolerâncias |
 | `13-ROBO-PAINEL-ZET.md` | Robô diário no painel da Zet para conciliar vendas, estornos, borderô e repasses com os webhooks |
 | `14-MAPEAMENTO-PAINEL-ZET.md` | Telas e exports do painel da Zet; **R$ 975,00 em contestações sem webhook** (saldo negativo do evento na Zet); vendas na máquina da Zet |
+| `17-PROMPT-PLANEJAMENTO-EXECUCAO.md` | Prompt para planejar a execução e a construção do sistema novo (domínio, banco, balanceamento, segurança, integrações, catracas) |
 | `16-INTEGRACAO-CATRACAS.md` | Integração com o sistema das catracas (Conexão Topdata): quem é dono de quê, conflitos a decidir (webhook, baixa na Zet, venda de balcão) e contrato v1 |
 | `15-IMPORTACAO-EXPORT-ZET.md` | Export de Transações: **fecha no centavo** com o painel (R$ 2.141.253,70); ponte webhooks → export; importação automática das vendas da máquina e dos webhooks perdidos |
 | `12-RELATORIO-DIARIO-E-ACERTO-ZET.md` | Relatório diário (financeiro, público, ticket médio, previsão) e acerto final com a Zet; prazos de estorno |
