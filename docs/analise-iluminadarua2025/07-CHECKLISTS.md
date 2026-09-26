@@ -35,7 +35,8 @@
 - [ ] Os 9 caixas fechados.
 - [ ] Assinatura das **duas pessoas designadas** (vigentes no momento da assinatura) sobre o mesmo conteúdo.
 - [ ] Dia travado; PDF com hash e QR arquivado.
-- [ ] Sangria registrada: Tesouraria → conta bancária escolhida (depósito) ou Tesouraria → Despesa (com comprovante). Transferências entre contas também registradas.
+- [ ] Sangria registrada (venda + fundos de troco): Tesouraria → conta bancária escolhida (depósito) ou Tesouraria → Despesa (com comprovante). Transferências entre contas também registradas.
+- [ ] Tesouraria **zerada** no fim do dia (nada fica de um dia para o outro).
 
 ## B. Segurança para produção
 
@@ -51,10 +52,11 @@
 - [ ] Separação de funções: quem lança não aprova; quem aprova não reabre.
 
 **Integração Zet**
-- [ ] HMAC obrigatório com comparação em tempo constante.
-- [ ] Token secreto na URL; segredo rotacionado desde o incidente.
+- [ ] Token secreto no endereço do webhook (a Zet não assina), comparado em tempo constante; trocado desde o incidente.
+- [ ] Entrada do webhook na borda (Cloudflare Worker + fila), **sem depender do banco** para responder.
 - [ ] Limite de corpo de 64 KB; WAF e rate limit ativos; lista de IPs da Zet (se disponível).
-- [ ] Endpoint faz 1 RPC e responde em menos de 200 ms (p95).
+- [ ] Endpoint responde em menos de 100 ms (p95) mesmo com o banco fora do ar (teste de queda).
+- [ ] Validação de conteúdo: líquido do pedido = preços de tabela dos vouchers − desconto de campanha; divergência vira exceção.
 - [ ] Worker idempotente com máquina de estados e fila morta com alerta.
 
 **Dados e recuperação**

@@ -32,9 +32,13 @@ Não há uma única causa: são **cinco mecanismos somados**.
 
 Além disso, dois documentos do próprio repositório **se contradiziam sobre a taxa da Zet**. A regra confirmada é: **a taxa é um acréscimo de 10% sobre o preço do ingresso, pago pelo cliente e retido pela Zet** (ingresso R$ 30,00 + taxa R$ 3,00 = R$ 33,00 no payload). O documento `FINANCIAL-CALCULATIONS.md` tratava a taxa como 10% do bruto; por isso achava que a Zet cobrava "a mais" (as taxas de 9,09% do bruto são exatamente 10% do líquido). Além disso, o fechamento diário soma o **bruto** na divisão por forma de pagamento e o **líquido** na divisão por tipo de ingresso, então as duas não batem entre si (ver P-04 e P-15 em `02-RELATORIO-DE-PROBLEMAS.md`).
 
-### 2. Ataque na API da Zet, queda e perda de dados
-- O webhook v1 roda em **modo permissivo** (aceita vendas **sem assinatura**, conforme `docs/integrations/COMPRENOZET-INTEGRATION.md`), e o **webhook v2 não tem validação de assinatura nenhuma**. Qualquer pessoa na internet consegue criar vendas falsas ou marcar vendas reais como ESTORNADO.
-- Cada requisição dispara **cerca de 46 operações no banco**, sem limite de tamanho do corpo, sem rate limit e com um `sleep` de 2 s em caso de concorrência. Cada requisição do atacante vira dezenas de escritas: amplificação perfeita para derrubar o banco.
+### 2. Queda da integração Zet e perda de dados
+**O que aconteceu** (seu relato + código): no dia do apagão da AWS (provavelmente 20/10/2025), o banco ficou fora. O webhook em `api.ruailuminada.com` (Cloudflare → Supabase) **dependia do banco para responder**. Quando tudo voltou, chegou uma enxurrada de requisições (muito provavelmente os reenvios acumulados da Zet), o banco travou, as vendas ficaram gravadas pela metade, os reenvios sobrescreveram registros e somaram estornos em dobro. Os payloads daquela data ficaram corrompidos e os valores deixaram de bater com a plataforma. A reconstituição passo a passo está em `04-INTEGRACAO-ZET.md`, seção 9.
+
+Os fatores do código que transformaram uma queda de infraestrutura em perda de dados:
+- **A Zet não assina os webhooks** (confirmado). O v1 aceitava tudo em modo permissivo e o **v2 não tinha validação nenhuma**. Qualquer pessoa que descobrisse o endereço podia criar vendas falsas ou marcar vendas reais como ESTORNADO.
+- Cada requisição dispara **cerca de 46 operações no banco**, sem transação, sem limite de tamanho do corpo, sem rate limit e com um `sleep` de 2 s em caso de concorrência. Um pico de reenvios (ou de ataque) vira dezenas de escritas por requisição: amplificação perfeita para travar o banco.
+- Reenvios **sobrescrevem** vendas (upsert sem proteção), estornos são somados de novo, e o **estorno parcial é tratado como total** (P-18).
 - **Pelo menos 81 das 111 edge functions não verificam o papel do usuário** e usam a `service_role` (acesso total). `verify_jwt = true` **não protege**, porque a chave anônima pública que está no front-end é um JWT válido. Entre elas:
   - `reset-comprenozet-online-sales` apaga todas as vendas Zet de um período;
   - `cleanup-test-events` (`verify_jwt = false`) apaga as validações e os acessos do dia;
@@ -56,7 +60,7 @@ Além disso, dois documentos do próprio repositório **se contradiziam sobre a 
 1. **Dinheiro = inteiro em centavos**, com um único tipo `Money` e uma única política de arredondamento (meio-para-cima, com decimal exato, nunca float).
 2. **Livro-razão de partidas dobradas, append-only**: nada é editado nem apagado; correção é estorno mais novo lançamento. O banco garante `Σ débitos = Σ créditos`.
 3. **Saldos e fechamentos são derivados do livro-razão**, e o fechamento **trava o período**.
-4. **Webhook = caixa de entrada**: grava o corpo cru, valida HMAC com timestamp, responde 200 rápido e processa de forma assíncrona e idempotente, com máquina de estados.
+4. **Webhook = caixa de entrada na borda**: como a Zet não assina, a origem é provada por token secreto no endereço e IPs no WAF. O corpo cru é guardado **na borda (Cloudflare), sem depender do banco**, e processado depois, de forma idempotente, com máquina de estados e estorno por ingresso.
 5. **Conciliação em três pontas** (sistema × Zet × extrato bancário), com fila de exceções.
 6. **Menor privilégio**: o navegador nunca escreve em tabela financeira. As escritas passam só por funções no servidor com checagem de papel. O usuário da aplicação não tem `DELETE`, `TRUNCATE` nem `DROP`.
 7. **Backup de verdade**: PITR ativado, dump diário completo fora do Supabase, restauração testada todo mês.
@@ -65,8 +69,8 @@ Além disso, dois documentos do próprio repositório **se contradiziam sobre a 
 
 1. Desativar ou exigir papel de admin em `r2-backup`, `reset-comprenozet-online-sales`, `cleanup-test-events`, `cleanup-*`, `fix-*`, `reprocess-*`, `recalculate-*`, `migrate-*` e `remove-phantom-order`.
 2. Trocar as políticas `USING (true)` de `bank_transactions`, `zet_sales_master` e `webhook_logs` por `TO service_role` (ou por uma checagem de admin).
-3. `WEBHOOK_SIGNATURE_ENFORCEMENT=strict` e desativar o `comprenozet-webhook-v2`.
-4. Rotacionar `WEBHOOK_SECRET`, as chaves do R2 e a `service_role`.
+3. Desativar o `comprenozet-webhook-v2`. **Não** ligar o modo `strict` no v1: como a Zet não assina, ele recusaria todas as vendas. Em vez disso, trocar o endereço do webhook na Zet por um com token secreto e criar no Cloudflare uma regra de rate limit para `api.ruailuminada.com`.
+4. Rotacionar as chaves do R2 e a `service_role`.
 5. **Baixar agora** todos os backups do R2 e um `pg_dump` completo, e guardar fora do Supabase (é matéria-prima da recuperação).
 
 ## Documentos desta análise

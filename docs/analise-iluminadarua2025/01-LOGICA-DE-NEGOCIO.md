@@ -76,9 +76,11 @@ Consequências:
 - Validação (sem reescrever nada): `taxa ≈ arredondar(líquido × 10%)`. Como a Zet pode arredondar por ingresso, aceita-se uma diferença de até 1 centavo por ingresso; acima disso, abre-se exceção para conferir com a Zet.
 - Visto sobre o bruto, a taxa dá 9,09% (`3/33`). O documento `FINANCIAL-CALCULATIONS.md` calculava "10% do bruto" e por isso achava que a Zet cobrava a mais. **Essa regra estava errada**; a de `COMPRENOZET-TAX-CALCULATION.md` estava certa.
 
-**Estorno online (confirmado):** o evento devolve **só o preço do ingresso**; a taxa da Zet não é estornada pelo evento.
+**Estorno online (confirmado):** o evento devolve **só o preço do ingresso**; a taxa da Zet não é estornada pelo evento. Pode ser total ou parcial.
 
-**Desconto (confirmado):** só existe em **campanhas**. O desconto reduz o preço do ingresso, e portanto a receita do evento; a taxa é calculada sobre o valor já com desconto. O sistema guarda `discount` na venda para o relatório de campanhas. **Ainda a confirmar com a Zet** (técnico): se `totalValue` já vem com o desconto aplicado. O webhook antigo gravava `orders.total_amount = totalValue − discount` e `gross_amount = totalValue`, o que só estaria certo em um dos dois casos.
+**Desconto (confirmado):** só existe em **campanhas**. O `totalValue` que a Zet envia **já vem com o desconto aplicado**, e a taxa é calculada sobre o valor com desconto. O campo `discount` é só informativo, para o relatório de campanhas. O webhook antigo gravava `orders.total_amount = totalValue − discount`, ou seja, **subtraía o desconto duas vezes** (P-13).
+
+**Estorno parcial (confirmado):** a Zet pode estornar só alguns ingressos de um pedido. O estorno é tratado ingresso a ingresso.
 
 **Dia operacional do online (confirmado):** vai de 00:00 a 23:59:59 no horário de Brasília (`America/Sao_Paulo`), pela data de pagamento.
 
@@ -87,6 +89,7 @@ Consequências:
 2. **Venda**: dinheiro, cartão ou PIX (maquininha PagBank). Produtos vendidos no caixa entram na bilheteria, mas não no ticket médio.
 3. **Estorno na bilheteria**: sempre **total** (a venda inteira é devolvida ao cliente, pelo mesmo meio de pagamento).
 4. **Fechamento do caixa**: informam-se os cartões restantes (vendidos = iniciais − restantes), o **dinheiro contado**, o total da maquininha e o total de PIX. O caixa **devolve o fundo de troco junto com a venda do dia**.
+   - **Nada fica de um dia para o outro (confirmado)**: o fundo de troco vai junto na sangria. No dia seguinte, o valor do fundo é retirado de novo (da conta bancária) e entregue aos caixas. A tesouraria começa e termina o dia **zerada**.
    - Dinheiro esperado = fundo de troco + vendas em dinheiro − estornos em dinheiro.
    - Diferença entre contado e esperado = quebra (falta) ou sobra, sempre registrada com justificativa.
 5. **Dia operacional da bilheteria (confirmado)**: termina **quando o caixa é fechado** para aquele dia, e não à meia-noite. Uma venda às 00:20 num caixa ainda aberto pertence ao dia daquele caixa.
@@ -134,7 +137,7 @@ O manual antigo (passo 3.6) fala em "pagar comissões de lojas" como despesa e e
 |---|-------|
 | R1 | Valores de venda online são os **exatos recebidos da Zet**. A taxa nunca é recalculada. A **receita do evento é o líquido** (`totalValue − totalTax`); a taxa é da Zet. |
 | R2 | Idempotência por `order.uuid`: um pedido corresponde a uma venda. |
-| R3 | Estorno online: o evento devolve **só o preço do ingresso** (o líquido); a taxa da Zet não é estornada. Estorno na bilheteria: sempre **total**. |
+| R3 | Estorno online: pode ser **parcial** (por ingresso); o evento devolve **só o preço do ingresso** (o líquido); a taxa da Zet não é estornada. Estorno na bilheteria: sempre **total**. |
 | R4 | Cortesia = venda com valor zero, contada como ingresso e fora da receita. |
 | R5 | Comissão de food = `vendas × %` **da própria loja** (percentual individual, com vigência), **arredondada a centavos uma única vez**. |
 | R6 | A **loja paga a comissão ao evento, diariamente**. O repasse é distribuído **FIFO** entre os dias pendentes. |
@@ -146,9 +149,9 @@ O manual antigo (passo 3.6) fala em "pagar comissões de lojas" como despesa e e
 | R11 | Repasse à administração preserva um **caixa mínimo configurado por evento**. |
 | R11a | Contas bancárias podem ser cadastradas e alteradas durante o evento (nunca apagadas); transferência entre contas é permitida e registrada. |
 | R12 | Dia operacional: **online** = 00:00–23:59:59 em America/Sao_Paulo; **bilheteria** = até o fechamento do caixa daquele dia. |
-| R14 | Cada um dos 9 caixas abre com um **fundo de troco** (valor pode variar por operador) e o devolve no fechamento junto com a venda. O fundo não é receita. |
+| R14 | Cada um dos 9 caixas abre com um **fundo de troco** (valor pode variar por operador) e o devolve no fechamento junto com a venda. O fundo não é receita. **Nenhum valor fica de um dia para o outro**: o fundo vai na sangria e é retirado de novo no dia seguinte; a tesouraria termina o dia zerada. |
 | R15 | Após o fechamento, a **sangria** leva o dinheiro para conta bancária ou para pagamento de despesas do evento, sempre com registro. |
-| R16 | Descontos só existem em **campanhas** e reduzem a receita do ingresso. |
+| R16 | Descontos só existem em **campanhas** e reduzem a receita do ingresso. O `totalValue` da Zet já vem com o desconto; `discount` é só informativo. |
 | R13 | Divergência de catraca: alerta acima de 5%, crítico acima de 10%; mais de 20 entradas de diferença é suspeita de fraude. |
 
 ## 4. Modelo de dados atual (resumo)

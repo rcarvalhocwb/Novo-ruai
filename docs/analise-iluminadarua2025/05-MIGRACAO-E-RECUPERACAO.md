@@ -62,10 +62,20 @@ create table recovery.rows (
 create index on recovery.rows(source, natural_key);
 ```
 
+### 2.1a A data do incidente (dia do apagão da AWS)
+
+Os payloads dessa data estão **corrompidos** (valores não batem com a plataforma), então **não servem como fonte**:
+
+1. Para essa data, a base é **só o relatório da Zet (F2)**, pedido a pedido, mais o extrato de repasses (F3) e o extrato bancário (F1).
+2. Os registros do banco antigo daquela data (`zet_sales_master`, `online_sales_transactions`, `orders`, `webhook_logs`) entram apenas como **evidência** para explicar a diferença (duplicados, sobrescritos, estornos em dobro), nunca como valor.
+3. Exportar do Cloudflare (Analytics/Logs de `api.ruailuminada.com`) o volume de requisições por minuto e os IPs daquele dia. Serve para saber se foi **reenvio em massa da Zet** (IPs da Zet, payloads repetidos) ou **tráfego malicioso** (IPs estranhos, payloads que não existem no relatório).
+4. Pedidos que existem no banco antigo mas não no relatório da Zet daquela data: tratar como **suspeitos** (possível venda forjada, já que o webhook não tinha assinatura) até a Zet confirmar.
+
 ### 2.2 Vendas online (Zet)
 1. **Base = F2** (relatório Zet), pedido a pedido.
 2. Casar com F7 (payload bruto) por `order_uuid`. Se o payload existe e os valores batem, o pedido está **provado por duas fontes**.
 3. Só em F2 (webhook perdido ou registro apagado): lançar com `source='zet_report'`.
+3a. Estornos parciais: conferir ingresso a ingresso com o relatório da Zet. Pedidos marcados inteiros como estornados pelo sistema antigo (P-18) precisam ser reabertos para os ingressos que continuaram válidos.
 4. Só em F7 ou no dump (a Zet não lista): **suspeita de venda forjada** (o webhook era aberto). Confirmar com a Zet. Sem confirmação, **não entra** na receita e vira exceção.
 5. Status divergente (ex.: F2 = PAGO, banco = ESTORNADO): vale o **F2**. Registrar como exceção "possível estorno forjado".
 6. Conferir que Σ líquidos por lote de repasse (F3) é igual ao crédito correspondente em F1.

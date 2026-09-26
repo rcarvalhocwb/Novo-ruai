@@ -3,7 +3,7 @@
 ## 1. O que se sabe do contrato atual (extraído do código)
 
 ```jsonc
-POST /webhook   // header: x-webhook-signature = hex(HMAC-SHA256(WEBHOOK_SECRET, rawBody))
+POST https://api.ruailuminada.com/...   // passava pelo Cloudflare até o Supabase. A Zet NÃO assina os webhooks.
 {
   "action": "CP" | "ES",                  // compra paga | estorno
   "data": {
@@ -13,7 +13,7 @@ POST /webhook   // header: x-webhook-signature = hex(HMAC-SHA256(WEBHOOK_SECRET,
       "paymentType": "PIX" | "CARTAO" | "CORTESIA" | …,
       "paymentSituation": "PAGO" | "ESTORNADO" | "ESTORNO",
       "paymentConfirmeDate": "…", "createdAt": "…",
-      "totalValue": 110.0, "totalTax": 10.0, "discount": 0
+      "totalValue": 33.0, "totalTax": 3.0, "discount": 0   // totalValue já vem com o desconto aplicado
     },
     "eventTicketCodes": [
       { "id": 1, "voucher": "…", "eventsValues": { "description": "Inteira", "session": "…", "eventsDates": { "startDate": "…" } } }
@@ -23,96 +23,86 @@ POST /webhook   // header: x-webhook-signature = hex(HMAC-SHA256(WEBHOOK_SECRET,
 }
 ```
 
-**Para confirmar com a Zet** (ver `08-DUVIDAS.md`): se a assinatura existe e é enviada sempre; se há timestamp ou id de entrega; a política de reenvio (quantas vezes, intervalo, o que conta como sucesso); se a ordem de entrega é garantida; os IPs de origem; se existe **API de consulta** de pedidos ou relatório exportável; a semântica de `discount` e se existe estorno parcial. (Já confirmado: a taxa é um acréscimo de 10% sobre o preço do ingresso, retido pela Zet, e no estorno o evento devolve só o preço do ingresso.)
+**Confirmado com você:**
+- `totalValue` é o que o cliente pagou, **já com o desconto de campanha aplicado**. `totalTax` é o acréscimo de 10% da Zet sobre o preço. `discount` é só informativo (relatório de campanhas) e **não deve ser subtraído de novo**.
+- O estorno **pode ser parcial** (só alguns ingressos do pedido). No estorno, o evento devolve só o preço do ingresso; a taxa não é estornada pelo evento.
+- **A Zet não assina os webhooks.** Não há HMAC para validar. A segurança precisa vir de outras camadas (seção 7).
+
+**Ainda a confirmar com a Zet** (ver `08-DUVIDAS.md`): se o endereço do webhook pode ter um token secreto (na URL ou em header fixo); os IPs de origem; a política de reenvio (quantas vezes, intervalo, o que conta como sucesso); se existe **API de consulta** de pedidos ou só relatório exportável; e, no estorno parcial, o que vem em `totalValue`/`totalTax` e em `eventTicketCodes` (só os vouchers estornados ou o pedido todo).
 
 ## 2. Arquitetura
 
 ```mermaid
 sequenceDiagram
   participant Z as Zet
-  participant E as Borda (WAF/rate limit)
-  participant W as Edge function "zet-webhook"
-  participant DB as Postgres
-  participant Q as Fila (pgmq)
+  participant E as Cloudflare (WAF + rate limit)
+  participant W as Worker de borda "zet-ingest"
+  participant R as Fila/armazenamento durável na borda (Cloudflare Queues + R2)
+  participant C as Consumidor
+  participant DB as Postgres (Supabase)
   participant P as Worker "zet-processor"
-  Z->>E: POST /zet/webhook/<token-de-url>
-  E->>W: (limite 64 KB, 50 req/s por IP)
-  W->>W: valida HMAC sobre o corpo cru, com comparação em tempo constante
-  W->>DB: INSERT integ.webhook_inbox (corpo cru, headers, sha256, signature_ok)
-  W->>Q: send(inbox_id)
-  W-->>Z: 200 {"received": true}   (sempre rápido, em menos de 200 ms)
-  P->>Q: read (visibility timeout 60 s)
-  P->>DB: BEGIN; aplicar máquina de estados + lançamentos; COMMIT
-  P->>Q: delete / archive
+  Z->>E: POST api.ruailuminada.com/zet/<token-secreto>
+  E->>W: (limite 64 KB, rate limit, IPs da Zet se houver lista)
+  W->>W: confere o token (tempo constante) e o tamanho
+  W->>R: grava o corpo cru + headers + sha256 (não depende do banco)
+  W-->>Z: 200 {"received": true}  (em menos de 100 ms, mesmo com o banco fora)
+  C->>R: lê em lotes, no ritmo que o banco aguenta
+  C->>DB: INSERT integ.webhook_inbox (idempotente por sha256)
+  P->>DB: BEGIN; máquina de estados + lançamentos; COMMIT (1 pedido por vez, com lock)
 ```
 
 **Regras:**
-1. O endpoint **não** processa regra de negócio. Valida, grava **uma linha** e enfileira.
-2. Assinatura inválida: grava no inbox com `signature_ok=false`, `status='rejected'` e **responde 401**. Nada é processado. Guardar o que foi rejeitado é útil para investigar ataques. Se o volume for de ataque, o WAF corta antes.
+1. O endpoint **não** processa regra de negócio e **não depende do banco**: confere o token, guarda o corpo cru num armazenamento durável da borda e responde. Se o Supabase ou a AWS caírem, os webhooks continuam sendo aceitos e ficam guardados; quando o banco volta, o consumidor entrega **no ritmo que o banco aguenta**. Foi exatamente isso que faltou no incidente.
+2. Token errado ou ausente: 404, sem gravar nada (o WAF registra o IP). Como a Zet não assina, **o token é a única prova de origem**; ele fica só no painel da Zet e no cofre de segredos, e é trocado se vazar.
 3. O mesmo corpo repetido (sha256 igual) não gera nova linha (`ON CONFLICT DO NOTHING`) e responde 200.
 4. O worker é **idempotente** e roda **numa transação**: projeção da venda + lançamentos + status do inbox, ou tudo ou nada.
 5. Erro no processamento: `attempts++`, *backoff* exponencial (1 min, 5, 15, 60…) e, depois de 8 tentativas, **fila morta** + alerta. **Nunca apagar.**
 
-## 3. Endpoint (Deno / Supabase Edge)
+## 3. Endpoint
+
+A recomendação é um **Cloudflare Worker** no próprio `api.ruailuminada.com` (o domínio já passa pelo Cloudflare), gravando numa **Cloudflare Queue** (com cópia do corpo no R2). Assim a entrada dos webhooks fica independente do banco. Se preferir manter tudo no Supabase, a mesma lógica funciona numa edge function que grava direto no inbox, mas aí uma queda do banco volta a significar webhook recusado (a Zet teria que reenviar).
 
 ```ts
-// supabase/functions/zet-webhook/index.ts
-import { createClient } from 'npm:@supabase/supabase-js@2';
-import { encodeBase64, encodeHex } from 'jsr:@std/encoding@1';
+// Cloudflare Worker "zet-ingest"
+export interface Env { ZET_URL_TOKEN: string; ZET_QUEUE: Queue; RAW: R2Bucket }
 
 const MAX_BODY = 64 * 1024;
-const enc = new TextEncoder();
-
-async function hmacHex(secret: string, body: Uint8Array): Promise<string> {
-  const key = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-  const sig = new Uint8Array(await crypto.subtle.sign('HMAC', key, body));
-  return [...sig].map((b) => b.toString(16).padStart(2, '0')).join('');
-}
 function timingSafeEqual(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
   let r = 0;
   for (let i = 0; i < a.length; i++) r |= a.charCodeAt(i) ^ b.charCodeAt(i);
   return r === 0;
 }
+const hex = (b: ArrayBuffer) => [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, '0')).join('');
 
-Deno.serve(async (req) => {
-  if (req.method !== 'POST') return new Response(null, { status: 405 });
+export default {
+  async fetch(req: Request, env: Env): Promise<Response> {
+    if (req.method !== 'POST') return new Response(null, { status: 405 });
 
-  // token secreto na URL: camada extra, caso a Zet não assine sempre
-  const url = new URL(req.url);
-  if (!timingSafeEqual(url.searchParams.get('t') ?? '', Deno.env.get('ZET_URL_TOKEN')!)) {
-    return new Response(null, { status: 404 });
-  }
+    // a Zet não assina: o token secreto no caminho é a prova de origem
+    const token = new URL(req.url).pathname.split('/').pop() ?? '';
+    if (!timingSafeEqual(token, env.ZET_URL_TOKEN)) return new Response(null, { status: 404 });
 
-  const len = Number(req.headers.get('content-length') ?? '0');
-  if (len > MAX_BODY) return new Response(null, { status: 413 });
-  const raw = new Uint8Array(await req.arrayBuffer());
-  if (raw.byteLength > MAX_BODY) return new Response(null, { status: 413 });
+    if (Number(req.headers.get('content-length') ?? '0') > MAX_BODY) return new Response(null, { status: 413 });
+    const raw = await req.arrayBuffer();
+    if (raw.byteLength > MAX_BODY) return new Response(null, { status: 413 });
 
-  const given = (req.headers.get('x-webhook-signature') ?? '').toLowerCase();
-  const expected = await hmacHex(Deno.env.get('ZET_WEBHOOK_SECRET')!, raw);
-  const signatureOk = given.length > 0 && timingSafeEqual(given, expected);
-
-  const sha = new Uint8Array(await crypto.subtle.digest('SHA-256', raw));
-  const db = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
-
-  // RPC única: insere no inbox (idempotente por sha256) e enfileira se a assinatura for válida
-  const { error } = await db.rpc('integ_receive_webhook', {
-    p_source: 'zet',
-    p_raw_body_b64: encodeBase64(raw),
-    p_body_sha256_hex: encodeHex(sha),
-    p_headers: { 'user-agent': req.headers.get('user-agent'), 'content-type': req.headers.get('content-type') },
-    p_remote_ip: req.headers.get('cf-connecting-ip') ?? req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? null,
-    p_signature_ok: signatureOk,
-  });
-  if (error) return new Response(null, { status: 503 }); // a Zet reenvia
-
-  return new Response(signatureOk ? '{"received":true}' : null, {
-    status: signatureOk ? 200 : 401,
-    headers: { 'content-type': 'application/json' },
-  });
-});
+    const sha = hex(await crypto.subtle.digest('SHA-256', raw));
+    const receivedAt = new Date().toISOString();
+    // cópia imutável do corpo cru (a mesma chave para o mesmo corpo = idempotente)
+    await env.RAW.put(`zet/${receivedAt.slice(0, 10)}/${sha}.json`, raw);
+    await env.ZET_QUEUE.send({
+      sha256: sha,
+      received_at: receivedAt,
+      remote_ip: req.headers.get('cf-connecting-ip'),
+      user_agent: req.headers.get('user-agent'),
+    });
+    return new Response('{"received":true}', { status: 200, headers: { 'content-type': 'application/json' } });
+  },
+};
 ```
+
+O **consumidor** da fila lê o corpo no R2 e chama a RPC `integ_receive_webhook` (seção 4) com `p_signature_ok = true` (o token já foi validado na borda). Se o banco estiver fora, a mensagem volta para a fila com *backoff*; nada se perde.
 
 ## 4. Tabelas
 
@@ -186,7 +176,7 @@ create table sales.zet_orders (
   order_uuid      uuid primary key,
   zet_order_id    bigint not null unique,
   event_id        uuid not null references public.events(id) on delete restrict,
-  status          text not null check (status in ('PAGO','ESTORNADO')),
+  status          text not null check (status in ('PAGO','PARCIALMENTE_ESTORNADO','ESTORNADO')),
   gross_cents     bigint not null check (gross_cents >= 0),
   fee_cents       bigint not null check (fee_cents >= 0 and fee_cents <= gross_cents),
   discount_cents  bigint not null default 0 check (discount_cents >= 0),
@@ -214,7 +204,10 @@ create table sales.zet_order_items (
 stateDiagram-v2
   [*] --> PAGO: CP válido (lança venda)
   PAGO --> PAGO: CP repetido (no-op)
-  PAGO --> ESTORNADO: ES (lança estorno, cancela vouchers)
+  PAGO --> PARCIALMENTE_ESTORNADO: ES com parte dos vouchers
+  PARCIALMENTE_ESTORNADO --> PARCIALMENTE_ESTORNADO: ES de outros vouchers
+  PARCIALMENTE_ESTORNADO --> ESTORNADO: ES dos vouchers restantes
+  PAGO --> ESTORNADO: ES de todos os vouchers
   ESTORNADO --> ESTORNADO: ES repetido (no-op)
   ESTORNADO --> ESTORNADO: CP atrasado (no-op + exceção "CP após ES")
   [*] --> EXCECAO: ES sem CP (exceção "estorno órfão"; buscar pedido na Zet)
@@ -225,10 +218,11 @@ stateDiagram-v2
 | CP de pedido novo | Cria `zet_orders` e itens; `fin.post_entry(key='zet:CP:<uuid>')` |
 | CP repetido com **mesmos valores** | Nada (a chave idempotente já existe) |
 | CP repetido com **valores diferentes** | **Não sobrescreve.** Abre `recon.exceptions(kind='amount_mismatch')` para análise humana |
-| ES de pedido PAGO | Status ESTORNADO, vouchers cancelados, `fin.post_entry(key='zet:ES:<uuid>')` devolvendo **só o preço do ingresso** (a taxa não é estornada pelo evento). Se o ES trouxer só parte dos vouchers, estorna-se a soma de `net_cents` desses vouchers |
+| ES (total ou parcial) | O estorno é **por voucher**: para cada voucher do ES ainda válido, cancela o voucher e lança `fin.post_entry(key='zet:ES:<uuid>:<voucher>')` com o `net_cents` daquele voucher (só o preço do ingresso; a taxa não é estornada pelo evento). Voucher já cancelado = no-op. O status do pedido vira PARCIALMENTE_ESTORNADO ou ESTORNADO conforme sobrem vouchers válidos. O valor estornado calculado é conferido com o que o payload informar; divergência vira exceção |
 | ES repetido | Nada |
 | ES antes de CP | Exceção. O worker tenta de novo depois (CP pode chegar). Depois de 24 h, alerta |
 | CP depois de ES | Exceção. Nunca reverte o estorno |
+| CP repetido com valores diferentes (como no incidente) | **Nunca sobrescreve.** O primeiro CP válido vale; o divergente vai para exceção e é resolvido pelo relatório da Zet |
 | Evento não mapeado | Status `failed` com erro "evento Zet X sem mapeamento". Alerta. Depois de mapear, reprocessa |
 | Tipo de ingresso não mapeado | Idem |
 
@@ -251,8 +245,12 @@ if action = CP:
      post_entry('zet:CP:'||uuid, D A receber Zet net, C Receita online net)
 if action = ES:
    if not exists order: exceção 'estorno órfão' (retry)
-   elif status = ESTORNADO: no-op
-   else: update status; cancelar itens; post_entry('zet:ES:'||uuid, D Estornos online net, C A receber Zet net)
+   else:
+     for voucher in eventTicketCodes:
+        if item(voucher).status = 'valid':
+           item.status := 'cancelled'
+           post_entry('zet:ES:'||uuid||':'||voucher, D Estornos online item.net_cents, C A receber Zet item.net_cents)
+     status := ESTORNADO se não sobrou voucher válido, senão PARCIALMENTE_ESTORNADO
 update inbox set status='processed', processed_at=now()
 ```
 
@@ -260,10 +258,10 @@ update inbox set status='processed', processed_at=now()
 
 | Ataque ou falha | Defesa |
 |-----------------|--------|
-| Venda forjada | HMAC obrigatório + token na URL + (se a Zet publicar) lista de IPs no WAF |
+| Venda forjada | A Zet não assina, então: token secreto no endereço + lista de IPs da Zet no WAF (se ela fornecer) + **validação de conteúdo** (o líquido tem de bater com os preços de tabela dos vouchers, menos desconto de campanha) + a venda só é considerada **conciliada** quando aparece no relatório da Zet. Venda que não aparece no relatório vira exceção "venda fantasma" |
 | Replay de venda ou estorno | Idempotência por `order_uuid` + máquina de estados: o replay é inofensivo |
-| Enxurrada de requisições | WAF/rate limit na borda; corpo de no máximo 64 KB; o endpoint faz 1 RPC; a fila absorve picos; o worker tem concorrência fixa |
-| Banco fora do ar | O endpoint responde 503 e a Zet reenvia (confirmar a política). Nada se perde se a Zet reenviar; se não reenviar, o **pull de conciliação** (abaixo) recupera |
+| Enxurrada de requisições (ataque ou reenvio em massa depois de uma queda) | WAF/rate limit na borda; corpo de no máximo 64 KB; o endpoint **não toca o banco**; a fila absorve o pico e o consumidor entrega no ritmo que o banco aguenta; o worker processa 1 pedido por vez com lock |
+| Banco ou AWS fora do ar | A borda continua aceitando e guardando; nada depende do banco para responder à Zet. Quando o banco volta, a fila é drenada aos poucos. Se algo ainda faltar, o **pull de conciliação** (abaixo) recupera |
 | Apagamento de dados | Inbox e livro-razão append-only, sem DELETE nem para `service_role`; PITR; dump externo imutável |
 | Webhook que nunca chegou | **Job diário de conciliação**: baixa o relatório da Zet (API ou planilha) e compara pedido a pedido com `zet_orders`. O que faltar vira exceção e pode ser importado a partir do relatório, com `source='zet_report'` |
 
@@ -276,3 +274,16 @@ update inbox set status='processed', processed_at=now()
    - nos dois com valores diferentes: exceção.
 3. Somar os líquidos por data de repasse e comparar com o crédito no extrato bancário ("A receber Zet" deve zerar a cada repasse).
 4. Meta: **diferença R$ 0,00** todo dia. Qualquer centavo vira exceção com responsável.
+
+## 9. O que aconteceu no incidente (reconstituição)
+
+Pelo seu relato e pelo código:
+
+1. No dia do apagão da AWS (provavelmente **20/10/2025**, a grande queda da região us-east-1; confirme a data), o banco do Supabase ficou indisponível ou lento.
+2. O webhook (`api.ruailuminada.com` → Cloudflare → edge function → banco) **dependia do banco para responder**. Cada requisição fazia cerca de 46 operações no banco (S-15), sem transação (C-01).
+3. Quando os serviços voltaram, chegou **uma grande quantidade de requisições de uma vez**: muito provavelmente os **reenvios automáticos** da Zet acumulados durante a queda, somados ao tráfego normal (pode ter havido tráfego malicioso também; os logs do Cloudflare daquele dia mostram os IPs e o volume).
+4. O banco travou (conexões esgotadas, `sleep` de 2 s por corrida em C-07). Requisições caíram no meio do processamento, deixando vendas **gravadas pela metade** (C-01). A Zet, sem resposta 200, reenviou de novo.
+5. Os reenvios **sobrescreveram** registros (upsert com `ignoreDuplicates: false`, S-08/C-03), somaram estornos duas vezes (C-02) e, em estornos parciais, marcaram pedidos inteiros como estornados (P-18). Depois, funções de "correção" e "reprocessamento" rodaram por cima (P-05, S-14).
+6. Resultado: os payloads daquela data ficaram **corrompidos** e os valores deixaram de bater com a plataforma.
+
+O desenho acima ataca cada elo: a borda não depende do banco, a fila absorve o pico, o processamento é transacional e idempotente, nada é sobrescrito, e a conciliação diária com o relatório da Zet pega qualquer diferença.

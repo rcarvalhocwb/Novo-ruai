@@ -10,7 +10,7 @@ flowchart TB
     CF[WAF / rate limit<br/>Cloudflare ou similar]
   end
   subgraph Ingestão
-    WH[Endpoint webhook Zet<br/>fino: HMAC + timestamp + 1 INSERT]
+    WH[Worker de borda Zet<br/>token secreto + fila durável<br/>não depende do banco]
     IN[(integ.webhook_inbox<br/>corpo cru, append-only)]
     Q[[Fila pgmq]]
   end
@@ -157,6 +157,7 @@ No SQL, a mesma regra: `(amount_cents * bps + 5000) / 10000` em `bigint`.
 | Venda Zet (CP): ingresso 30,00, taxa 3,00, cliente paga 33,00 | A receber Zet 30,00 | Receita online 30,00 |
 | Estorno Zet (ES) do mesmo pedido | Estornos online 30,00 | A receber Zet 30,00 |
 | Repasse Zet cai no banco (98.000,00) | Banco 98.000,00 | A receber Zet 98.000,00 |
+| Início do dia: retirada do banco para os fundos de troco | Tesouraria | Banco |
 | Abertura do caixa 3 com fundo de troco de 200,00 | Caixa bilheteria 3 200,00 | Tesouraria 200,00 |
 | Venda bilheteria em dinheiro | Caixa bilheteria N | Receita bilheteria |
 | Estorno na bilheteria (sempre total), em dinheiro | Estornos da bilheteria | Caixa bilheteria N |
@@ -166,7 +167,7 @@ No SQL, a mesma regra: `(amount_cents * bps + 5000) / 10000` em `bigint`.
 | Fechamento do caixa 3: devolve fundo + venda em dinheiro (contado) | Tesouraria (contado) | Caixa bilheteria 3 (contado) |
 | Quebra de caixa (contado < esperado) | Quebra de caixa | Caixa bilheteria N |
 | Sobra de caixa | Caixa bilheteria N | Receita/Outras (ou passivo a apurar) |
-| Sangria para depósito bancário | Banco (conta escolhida) | Tesouraria |
+| Sangria para depósito bancário (venda + fundos de troco) | Banco (conta escolhida) | Tesouraria |
 | Transferência entre contas bancárias | Banco destino | Banco origem |
 | Sangria para pagar despesa do evento (com comprovante) | Despesa correspondente (5.9.xx) | Tesouraria |
 | Comissão loja do dia (vendas 1.234,56 × 15%) | A receber loja N 185,18 | Receita comissão foods 185,18 |
@@ -438,7 +439,7 @@ revoke update, delete, truncate on audit.log from public, anon, authenticated, s
 4. **Fechamento do dia**: só com os 9 caixas fechados. O sistema gera o resumo e o hash do conteúdo (`fin.day_snapshot`).
 5. **Assinaturas**: as **duas pessoas designadas** assinam o mesmo hash. A designação é uma tabela com vigência (`valid_from`, `valid_to`), trocável a qualquer momento; o banco só aceita assinatura de quem está designado **naquele instante**. Se algum lançamento entrar depois de uma assinatura, o hash muda e a assinatura deixa de valer (é preciso assinar de novo).
 6. `fin.close_period` exige **2 assinantes distintos sobre o mesmo hash** e então trava o dia (`status = 'closed'`). O PDF e o QR guardam o hash, e a verificação recalcula e compara.
-7. **Sangria**: depois do fechamento, lançamento de Tesouraria → Banco (depósito) ou Tesouraria → Despesa (pagamento com comprovante), num dia aberto.
+7. **Sangria**: depois do fechamento, lançamento de Tesouraria → Banco (depósito) ou Tesouraria → Despesa (pagamento com comprovante), num dia aberto. Como **nada fica de um dia para o outro**, a Tesouraria tem de terminar zerada: se sobrar saldo, o sistema alerta antes da abertura do dia seguinte.
 8. Ajuste depois do fechamento é **lançamento em dia aberto** com `metadata.adjusts_business_date`. Reabrir exige admin e motivo (`fin.period_reopenings`).
 9. O **rascunho** do wizard fica em outra tabela (`closure_drafts`) e **nunca** escreve na tabela de períodos.
 
@@ -634,7 +635,7 @@ create table recon.exceptions (
 | Risco | Medida |
 |-------|--------|
 | API1/API5: autorização quebrada | Toda função chama `requireRole()`. RLS padrão *deny*. Nenhuma policy `USING (true)` sem `TO service_role`. Teste automatizado que falha se aparecer uma. |
-| API2: autenticação quebrada | Webhook com HMAC-SHA256 + timestamp + janela de 5 min + comparação em tempo constante. Cron com segredo próprio. MFA para admin. |
+| API2: autenticação quebrada | Webhook: a Zet não assina, então token secreto no endereço (comparação em tempo constante) + IPs da Zet no WAF + validação de conteúdo + conciliação com o relatório. Cron com segredo próprio. MFA para admin. |
 | API3: exposição de propriedades | Views de leitura sem CPF/telefone para quem não precisa. Backups criptografados. |
 | API4: consumo de recursos | Rate limit na borda; limite de corpo (64 KB); endpoint de webhook faz 1 INSERT; processamento assíncrono. |
 | API6: fluxos sensíveis | Estorno, reabertura e ajuste exigem papel específico e motivo, e ficam registrados. |
@@ -654,8 +655,8 @@ create table recon.exceptions (
 ## 8. Observabilidade
 
 - Logs estruturados em JSON com `correlation_id` (= id do inbox ou `order_uuid`).
-- Métricas: webhooks por minuto, taxa de rejeição de assinatura, tamanho da fila, idade da mensagem mais antiga, exceções de conciliação abertas.
-- Alertas: fila parada há mais de 5 min; mais de 1% de assinaturas inválidas; lançamento desbalanceado (não deve acontecer; se acontecer, é bug); saldo "A receber Zet" negativo; pico de requisições.
+- Métricas: webhooks por minuto, requisições com token inválido, tamanho da fila, idade da mensagem mais antiga, exceções de conciliação abertas.
+- Alertas: fila parada há mais de 5 min; pico de requisições com token inválido; pedido cujo valor não bate com os preços de tabela; lançamento desbalanceado (não deve acontecer; se acontecer, é bug); saldo "A receber Zet" negativo; pico de requisições.
 - Dashboard diário: vendas Zet (sistema) × relatório Zet, com diferença esperada **R$ 0,00**.
 
 ## 9. Testes
@@ -664,7 +665,7 @@ create table recon.exceptions (
 |------|-------------|
 | Propriedade (fast-check) | `allocate`, `applyRate`, `parseBRL`: soma preservada, arredondamento, ida e volta. |
 | SQL (pgTAP) | Lançamento desbalanceado é rejeitado; UPDATE/DELETE em `fin.*` falha; dia fechado rejeita lançamento; `post_entry` idempotente. |
-| Webhook | Assinatura inválida é 401; replay com timestamp velho é 401; o mesmo CP duas vezes gera 1 lançamento; ES antes de CP vai para exceção; CP depois de ES não reverte. |
+| Webhook | Token inválido é 404; o mesmo CP duas vezes gera 1 lançamento; CP repetido com valores diferentes não sobrescreve; ES parcial cancela só os vouchers citados; ES antes de CP vai para exceção; CP depois de ES não reverte; com o banco fora, a borda continua respondendo 200 e nada se perde. |
 | Concorrência | 50 CPs iguais em paralelo geram 1 venda; 2 ES em paralelo geram 1 estorno. |
 | Carga | 200 req/s no webhook com o banco saudável (o endpoint só faz INSERT). |
 | Fechamento com dados reais anonimizados | Rodar um dia real do evento passado e conferir que o fechamento é igual ao extrato. |

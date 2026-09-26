@@ -20,12 +20,12 @@ Cada fase entrega algo utilizável e tem **critério de aceite objetivo**. Uma f
 **Aceite:** a suíte prova que lançamento desbalanceado, UPDATE/DELETE no livro-razão e lançamento em dia fechado são rejeitados; `allocate` e `applyRate` passam em mais de 10 mil casos aleatórios.
 
 ## Fase 2: Integração Zet (1 a 2 semanas)
-- Endpoint fino, inbox, pgmq, worker e máquina de estados (`04-INTEGRACAO-ZET.md`).
+- Worker de borda no Cloudflare com fila durável, consumidor, inbox, worker e máquina de estados com estorno por ingresso (`04-INTEGRACAO-ZET.md`).
 - De-para de eventos e tipos de ingresso.
 - Borda com WAF e rate limit.
 - Job diário de conciliação Zet × sistema.
 
-**Aceite:** os testes de webhook passam (assinatura, replay, duplicata, ES antes de CP, CP depois de ES, 50 CPs concorrentes geram 1 venda); teste de carga de 200 req/s sem degradar o banco; um dia de homologação com o relatório Zet × sistema **R$ 0,00**.
+**Aceite:** os testes de webhook passam (token, duplicata, CP repetido com valor diferente, ES parcial, ES antes de CP, CP depois de ES, 50 CPs concorrentes geram 1 venda, **banco desligado durante o teste sem perder nenhum webhook**); teste de carga de 200 req/s sem degradar o banco; um dia de homologação com o relatório Zet × sistema **R$ 0,00**.
 
 ## Fase 3: Bilheteria e fechamento (2 semanas)
 - Sessões de caixa (abertura, fechamento, contagem) gerando lançamentos.

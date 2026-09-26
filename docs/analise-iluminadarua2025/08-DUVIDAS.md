@@ -5,32 +5,32 @@ A análise marcou como **[DÚVIDA]** tudo o que o código não permite afirmar. 
 ## Para você (regra de negócio)
 
 1. ~~**Taxa da Zet**~~ **Respondida:** acréscimo de 10% sobre o preço do ingresso, pago pelo cliente e retido pela Zet (R$ 30,00 + R$ 3,00 = R$ 33,00 no payload). A receita do evento é o líquido.
-2. ~~**Desconto**~~ **Respondida:** só em campanhas. *Técnico, para a Zet:* `totalValue` já vem com o desconto aplicado?
-3. ~~**Estorno Zet (taxa)**~~ **Respondida:** o evento devolve só o preço do ingresso (R$ 30,00); a taxa não afeta o evento. Na bilheteria o estorno é sempre total. *Técnico, para a Zet:* o webhook ES pode trazer só parte dos vouchers do pedido? (O desenho já trata os dois casos.)
+2. ~~**Desconto**~~ **Respondida:** só em campanhas; o `totalValue` já vem com o desconto aplicado.
+3. ~~**Estorno Zet (taxa)**~~ **Respondida:** o evento devolve só o preço do ingresso (R$ 30,00); a taxa não afeta o evento. Na bilheteria o estorno é sempre total; no online **pode ser parcial**. *Técnico, para a Zet:* no ES parcial, `eventTicketCodes` traz só os vouchers estornados? E o que vem em `totalValue`/`totalTax`?
 4. ~~**Comissão de foods**~~ **Respondida:** a loja paga a comissão ao evento. O repasse é receita do evento.
 5. ~~**Ajuste de comissão**~~ **Respondida:** percentual individual por loja, pagamento diário; pagamento a menor é **falta de repasse**, com alerta para pagar no próximo caixa.
 6. **Ingressos físicos:** o preço dos cartões inteira, meia e social é fixo por evento/dia? Há venda de produtos em todos os caixas?
 7. ~~**Caixa mínimo**~~ **Respondida:** configurado por evento.
 8. ~~**Dia operacional**~~ **Respondida:** online vira à meia-noite; bilheteria termina quando o caixa daquele dia é fechado.
 9. ~~**Aprovação**~~ **Respondida:** o relatório é assinado por duas pessoas designadas durante o evento, trocáveis a qualquer momento. Depois do fechamento, a sangria vai para conta bancária ou para pagamento de despesas.
-9a. ~~**Fundo de troco**~~ **Respondida em parte:** o valor pode variar por operador. *Ainda aberto:* depois de devolvido, o fundo fica guardado na tesouraria para o dia seguinte ou entra na sangria junto com a venda?
+9a. ~~**Fundo de troco**~~ **Respondida:** varia por operador; vai junto na sangria e é retirado de novo no início do dia seguinte. Nada fica de um dia para o outro.
 10. ~~**Contas bancárias**~~ **Respondida:** cadastradas e alteradas durante o evento, com transferência entre contas. *Observação:* se alguma conta for de pessoa física (o código antigo cita `fabio`), convém registrar o titular para a prestação de contas.
 
 ## Para a Zet (técnico)
 
-11. A assinatura HMAC é enviada **sempre**? Qual header, algoritmo e formato (hex ou base64)? É calculada sobre o corpo cru?
-12. Há **timestamp** ou **id de entrega** no webhook (para proteção contra replay)?
-13. Qual é a política de **reenvio** (quantas tentativas, intervalo, o que conta como sucesso: 2xx)?
-14. A ordem CP → ES é garantida?
-15. Quais são os **IPs de origem** dos webhooks?
-16. Existe **API de consulta** de pedidos (por período e por uuid) ou só export do painel?
-17. Existe relatório de **composição de cada repasse** (quais pedidos entraram)?
+11. ~~Assinatura~~ **Respondida:** a Zet **não assina** os webhooks.
+12. O endereço do webhook pode ser configurado com um **token secreto** (no caminho ou num header fixo)? Isso é essencial, já que não há assinatura.
+13. Quais são os **IPs de origem** dos webhooks (para liberar só eles no Cloudflare)?
+14. Qual é a política de **reenvio** (quantas tentativas, intervalo, o que conta como sucesso)? Foi isso que gerou a enxurrada depois do apagão?
+15. Existe **API de consulta** de pedidos (por período e por uuid) ou só export do painel?
+16. Existe relatório de **composição de cada repasse** (quais pedidos entraram)?
 
 ## Sobre o incidente
 
-18. Quais dados exatamente foram apagados (tabelas e período)? Isso permite casar com os logs das funções e descobrir o vetor (S-01 a S-07, S-11, S-14).
-19. Qual endpoint estava configurado no painel da Zet: `comprenozet-webhook` (v1, modo permissivo) ou `comprenozet-webhook-v2` (sem assinatura)?
-20. Qual era o plano do Supabase na época (Free/Pro) e se o PITR estava ativo.
+17. ~~O que foi perdido~~ **Respondida:** os payloads de uma data (o dia do apagão da AWS) ficaram corrompidos depois de uma enxurrada de requisições que travou o banco; os valores deixaram de bater com a plataforma.
+18. ~~Endpoint~~ **Respondida:** `api.ruailuminada.com`, passando pelo Cloudflare até o banco.
+19. Qual é a **data exata** do incidente? (Provavelmente 20/10/2025.)
+20. O plano do Cloudflare guarda **logs/analytics** daquele dia? Eles mostram se a enxurrada veio da Zet (reenvios) ou de outros IPs.
 21. O sistema antigo ainda está no ar e recebendo webhooks?
 
 ---
