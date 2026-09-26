@@ -16,7 +16,9 @@ Tudo o que está aqui foi extraído do código e da documentação do `iluminada
 | **Repasse online** | Transferência da Zet para a conta do evento (`online_transfers`: esperado × recebido). |
 | **Bilheteria** | Venda física: dinheiro, cartão/PIX na maquininha PagBank e cartões físicos de ingresso por caixa. |
 | **Bilheteria / caixa** | Um dos **9 caixas** físicos. Cada um abre o dia com um **fundo de troco** e o devolve no fechamento, junto com a venda do dia. |
-| **Fundo de troco** | Dinheiro do evento entregue a cada caixa para começar o dia. Não é receita: sai da tesouraria e volta para ela no fechamento. |
+| **Fundo de troco** | Dinheiro do evento entregue a cada caixa para começar o dia. **O valor pode variar por operador.** Não é receita: sai da tesouraria e volta para ela no fechamento. |
+| **Conta bancária** | Contas do evento, **cadastradas e alteradas durante o evento**. É possível transferir (sangria) de uma conta para outra. |
+| **Falta de repasse** | Quando a loja paga menos que a comissão do dia. A diferença **continua devida**: gera alerta e deve ser paga no próximo caixa ou quitada à parte. |
 | **Tesouraria / cofre** | Onde fica o dinheiro do evento entre o fechamento dos caixas e a sangria. |
 | **Sangria** | Depois do fechamento, retirada do dinheiro da tesouraria para **depósito numa conta bancária** ou para **pagamento de despesas do evento**. |
 | **Assinantes do fechamento** | As **duas pessoas designadas** para assinar o relatório de fechamento. São escolhidas durante o evento e podem ser trocadas a qualquer momento. |
@@ -81,7 +83,7 @@ Consequências:
 **Dia operacional do online (confirmado):** vai de 00:00 a 23:59:59 no horário de Brasília (`America/Sao_Paulo`), pela data de pagamento.
 
 ### 2.2 Bilheteria física (9 caixas)
-1. **Abertura**: cada um dos 9 caixas recebe da tesouraria o seu **fundo de troco** (valor definido por caixa) e a **quantidade inicial de cartões de ingresso** (inteira, meia e social).
+1. **Abertura**: cada um dos 9 caixas recebe da tesouraria o seu **fundo de troco**, cujo valor **pode variar por operador**; a sessão do caixa registra quem é o operador e quanto recebeu e a **quantidade inicial de cartões de ingresso** (inteira, meia e social).
 2. **Venda**: dinheiro, cartão ou PIX (maquininha PagBank). Produtos vendidos no caixa entram na bilheteria, mas não no ticket médio.
 3. **Estorno na bilheteria**: sempre **total** (a venda inteira é devolvida ao cliente, pelo mesmo meio de pagamento).
 4. **Fechamento do caixa**: informam-se os cartões restantes (vendidos = iniciais − restantes), o **dinheiro contado**, o total da maquininha e o total de PIX. O caixa **devolve o fundo de troco junto com a venda do dia**.
@@ -91,21 +93,23 @@ Consequências:
 6. Cartão e PIX têm taxa PagBank por modalidade (`pagbank_fee_config`: PIX 0,40%, débito 1,28%, crédito 3,08%). Hoje o sistema **estima** a taxa por média ponderada (2,27%) ou por um padrão de 2,5%. No novo sistema, a taxa **real** tem que vir do CSV ou extrato do PagBank.
 
 ### 2.3 Foods (lojas parceiras)
-1. A loja informa `total_sales` do dia. O sistema calcula `commission_amount = total_sales × commission_percentage`.
-2. A comissão fica **pendente** até a loja fazer o repasse.
-3. O repasse (`food_repayments`) é **distribuído FIFO** entre os dias pendentes selecionados (mais antigo primeiro). Cada dia fica `pending`, `partial` ou `paid`.
-4. O repasse entra como **receita** no caixa do evento (`source = food_repayment`).
-5. A loja tem movimentos próprios (sangria, despesa, ajustes) e fechamento próprio (`store_daily_closures`: vendas do dia e acumuladas, saídas, dinheiro esperado × declarado, diferença).
-6. Os foods **não entram** no saldo financeiro da bilheteria nem no ticket médio. Aparecem só como informação no relatório.
+1. **Percentual por loja (confirmado)**: cada loja tem o seu percentual de comissão, parametrizado individualmente. Se o percentual mudar, a mudança vale a partir de uma data e não altera dias anteriores.
+2. A loja informa as vendas do dia e o sistema calcula `comissão do dia = vendas × percentual da loja`, arredondada a centavos uma única vez.
+3. **Pagamento diário (confirmado)**: a **loja paga a comissão ao evento todos os dias**. O repasse é receita do evento.
+4. O repasse é **distribuído FIFO** entre os dias pendentes (o mais antigo primeiro). Cada dia fica `pendente`, `parcial` ou `pago`. Se a loja pagar a mais, o excedente vira crédito da loja.
+5. **Pagou menos (confirmado)**: a diferença **não é desconto nem perda**. É **falta de repasse**: continua devida, gera **alerta** e deve ser paga no próximo caixa ou quitada à parte. O alerta mostra o valor em aberto e há quantos dias.
+6. Só um admin, com motivo registrado, pode dar baixa numa falta de repasse (perdão da dívida). Isso vira um lançamento próprio, e não uma edição do valor da comissão.
+7. A loja tem movimentos próprios (sangria, despesa, ajustes) e fechamento próprio (vendas do dia e acumuladas, saídas, dinheiro esperado × declarado, diferença). Diferença de dinheiro na loja é **falta em caixa** da loja.
+8. Os foods **não entram** no saldo financeiro da bilheteria nem no ticket médio. Aparecem só como informação no relatório.
 
-**Confirmado:** a **loja paga a comissão ao evento**. O `FoodRepaymentService` está certo (repasse = receita do evento). O manual (passo 3.6), que fala em "pagar comissões de lojas" como despesa, está errado e deve ser corrigido no novo sistema: o passo passa a ser **"receber comissões das lojas"**.
+O manual antigo (passo 3.6) fala em "pagar comissões de lojas" como despesa e em "ajustar o valor recebido" como desconto acordado. **As duas coisas estão erradas**: a loja paga o evento, e o valor a menor é falta de repasse, não desconto.
 
 ### 2.4 Fechamento diário
 1. **Importar**: repasses online recebidos na data e transações PagBank liquidadas na data.
 2. **Caixas da bilheteria**: os 9 caixas fechados, cada um com o fundo de troco devolvido, dinheiro contado e diferença justificada.
 3. **Movimentações manuais**: receitas e despesas com forma de pagamento.
 4. **Catraca**: contagem inicial e final × ingressos vendidos (tolerância de 5 a 10; mais de 20 é alerta de fraude).
-5. **Comissões**: marcar as comissões **recebidas das lojas** e ajustar o valor (desconto acordado).
+5. **Comissões**: registrar o valor **recebido de cada loja**. Se for menor que a comissão devida, a diferença fica como **falta de repasse**, com alerta para o próximo caixa.
 6. **Revisão**: receitas − despesas = saldo; saldo físico deve ser igual ao saldo calculado.
 7. **Assinaturas (confirmado)**: o relatório é assinado pelas **duas pessoas designadas** para o fechamento. A designação é feita durante o evento e pode ser trocada a qualquer momento; vale quem estiver designado **no momento da assinatura**. Sai um PDF com as duas assinaturas e QR de verificação.
 8. **Sangria (confirmado)**: depois do fechamento, o dinheiro da tesouraria é retirado para **depósito em conta bancária** ou para **pagamento de despesas do evento** (com comprovante).
@@ -119,9 +123,10 @@ Consequências:
 - Ticket médio = (dinheiro + cartão + online) / total de ingressos (**sem foods e sem produtos**).
 - Divergência vendidos × validados: alerta acima de 5%, crítico acima de 10%.
 
-### 2.5 Caixa geral e repasse à administração
+### 2.5 Caixa geral, contas bancárias e repasse à administração
 - Receita total = Σ fechamentos. Saldo = receita − despesa. Saldo acumulado = saldo − Σ repasses à administração.
-- Sugestão de repasse = saldo acumulado − caixa mínimo (R$ 1.000).
+- Sugestão de repasse = saldo acumulado − **caixa mínimo**, que é **configurado por evento** (confirmado).
+- **Contas bancárias (confirmado)**: são cadastradas e alteradas durante o evento. É possível fazer sangria/transferência de uma conta para outra. Uma conta nunca é apagada, só desativada, para não perder o histórico.
 
 ## 3. Regras que DEVEM ser mantidas
 
@@ -131,15 +136,17 @@ Consequências:
 | R2 | Idempotência por `order.uuid`: um pedido corresponde a uma venda. |
 | R3 | Estorno online: o evento devolve **só o preço do ingresso** (o líquido); a taxa da Zet não é estornada. Estorno na bilheteria: sempre **total**. |
 | R4 | Cortesia = venda com valor zero, contada como ingresso e fora da receita. |
-| R5 | Comissão de food = `vendas × %` da loja, **arredondada a centavos uma única vez** (hoje isso é inconsistente). |
-| R6 | A **loja paga a comissão ao evento**. O repasse de food é distribuído **FIFO** entre os dias pendentes. |
+| R5 | Comissão de food = `vendas × %` **da própria loja** (percentual individual, com vigência), **arredondada a centavos uma única vez**. |
+| R6 | A **loja paga a comissão ao evento, diariamente**. O repasse é distribuído **FIFO** entre os dias pendentes. |
+| R6a | Pagamento a menor = **falta de repasse**: continua devida, gera alerta e deve ser paga no próximo caixa. Baixa só por admin, com motivo. |
 | R7 | Foods ficam fora do saldo da bilheteria e do ticket médio. |
 | R8 | Produtos ficam dentro da bilheteria e fora do ticket médio. |
 | R9 | Fechamento diário exige conferência física e a assinatura das **duas pessoas designadas** no momento da assinatura (designação alterável a qualquer momento). |
 | R10 | Fechamento aprovado é imutável; só um admin reabre, com motivo registrado. |
-| R11 | Repasse à administração preserva um caixa mínimo configurável. |
+| R11 | Repasse à administração preserva um **caixa mínimo configurado por evento**. |
+| R11a | Contas bancárias podem ser cadastradas e alteradas durante o evento (nunca apagadas); transferência entre contas é permitida e registrada. |
 | R12 | Dia operacional: **online** = 00:00–23:59:59 em America/Sao_Paulo; **bilheteria** = até o fechamento do caixa daquele dia. |
-| R14 | Cada um dos 9 caixas abre com um **fundo de troco** e o devolve no fechamento junto com a venda. O fundo não é receita. |
+| R14 | Cada um dos 9 caixas abre com um **fundo de troco** (valor pode variar por operador) e o devolve no fechamento junto com a venda. O fundo não é receita. |
 | R15 | Após o fechamento, a **sangria** leva o dinheiro para conta bancária ou para pagamento de despesas do evento, sempre com registro. |
 | R16 | Descontos só existem em **campanhas** e reduzem a receita do ingresso. |
 | R13 | Divergência de catraca: alerta acima de 5%, crítico acima de 10%; mais de 20 entradas de diferença é suspeita de fraude. |

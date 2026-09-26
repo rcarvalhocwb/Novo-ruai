@@ -133,10 +133,10 @@ No SQL, a mesma regra: `(amount_cents * bps + 5000) / 10000` em `bigint`.
 |--------|-------|------|----------|
 | 1.1.00 | Tesouraria / cofre do evento | Ativo | D |
 | 1.1.01 a 1.1.09 | Caixa bilheteria 1 a 9 | Ativo | D |
-| 1.1.02 | Banco – conta principal | Ativo | D |
+| 1.1.10+ | Banco – uma conta por conta bancária cadastrada (criadas e desativadas durante o evento) | Ativo | D |
 | 1.2.01 | A receber – Zet | Ativo | D |
 | 1.2.02 | A receber – PagBank (cartão/PIX) | Ativo | D |
-| 1.2.10+ | A receber – comissão loja *N* | Ativo | D |
+| 1.2.10+ | A receber – comissão loja *N* (o saldo é a falta de repasse da loja) | Ativo | D |
 | 2.1.01 | Crédito de loja (repasse a maior) | Passivo | C |
 | 3.1.01 | Repasses à administração | Patrimônio | D |
 | 4.1.01 | Receita ingressos online (líquido = preço do ingresso) | Receita | C |
@@ -147,6 +147,7 @@ No SQL, a mesma regra: `(amount_cents * bps + 5000) / 10000` em `bigint`.
 | 4.9.02 | Estornos da bilheteria | Redutora de receita | D |
 | 5.1.02 | Taxa PagBank (MDR) | Despesa | D |
 | 5.2.01 | Quebra de caixa | Despesa | D |
+| 5.2.02 | Baixa de comissão não recebida (só admin, com motivo) | Despesa | D |
 | 5.9.xx | Despesas operacionais | Despesa | D |
 
 ### 3.3 Lançamentos-padrão
@@ -165,10 +166,13 @@ No SQL, a mesma regra: `(amount_cents * bps + 5000) / 10000` em `bigint`.
 | Fechamento do caixa 3: devolve fundo + venda em dinheiro (contado) | Tesouraria (contado) | Caixa bilheteria 3 (contado) |
 | Quebra de caixa (contado < esperado) | Quebra de caixa | Caixa bilheteria N |
 | Sobra de caixa | Caixa bilheteria N | Receita/Outras (ou passivo a apurar) |
-| Sangria para depósito bancário | Banco | Tesouraria |
+| Sangria para depósito bancário | Banco (conta escolhida) | Tesouraria |
+| Transferência entre contas bancárias | Banco destino | Banco origem |
 | Sangria para pagar despesa do evento (com comprovante) | Despesa correspondente (5.9.xx) | Tesouraria |
 | Comissão loja do dia (vendas 1.234,56 × 15%) | A receber loja N 185,18 | Receita comissão foods 185,18 |
-| Repasse da loja (FIFO) | Banco / Caixa | A receber loja N (excedente em Crédito de loja) |
+| Repasse da loja do dia, valor cheio (FIFO) | Banco / Tesouraria | A receber loja N (excedente em Crédito de loja) |
+| Loja deve 500,00 e paga 450,00 | Banco / Tesouraria 450,00 | A receber loja N 450,00 *(os 50,00 continuam no saldo da loja = falta de repasse, com alerta)* |
+| Baixa de falta de repasse (só admin, com motivo) | Baixa de comissão não recebida | A receber loja N |
 | Repasse à administração | Repasses à administração | Banco |
 
 A **taxa da Zet não entra no livro-razão**: é um acréscimo pago pelo cliente e retido pela própria Zet, então nunca passa pelo caixa do evento. Bruto e taxa ficam registrados na venda (`sales.zet_orders`) para conferência. No estorno, o evento devolve só o preço do ingresso (R$ 30,00); a taxa continua sendo assunto entre cliente e Zet e nunca afeta o saldo do evento.
@@ -504,6 +508,80 @@ begin
   return v_hash;
 end $$;
 ```
+
+### 4.1 Cadastros com vigência (caixas, lojas, contas)
+
+```sql
+-- sessão de caixa: operador e fundo de troco (o valor pode variar por operador)
+create table fin.cashier_sessions (
+  id              uuid primary key default gen_random_uuid(),
+  event_id        uuid not null references public.events(id) on delete restrict,
+  business_date   date not null,                 -- dia operacional do caixa
+  cashier_number  int  not null check (cashier_number >= 1),
+  operator_id     uuid not null references auth.users(id),
+  float_cents     bigint not null check (float_cents >= 0),
+  opened_at       timestamptz not null default now(),
+  closed_at       timestamptz,
+  counted_cash_cents bigint check (counted_cash_cents >= 0)
+);
+-- um caixa só pode ter uma sessão aberta por vez
+create unique index cashier_one_open on fin.cashier_sessions(event_id, cashier_number) where closed_at is null;
+
+-- percentual de comissão por loja, com vigência (mudança não altera dias passados)
+create extension if not exists btree_gist;
+create table fin.store_commission_rates (
+  id          bigserial primary key,
+  event_id    uuid not null references public.events(id) on delete restrict,
+  store_id    uuid not null,                    -- references public.stores(id)
+  rate_bps    int  not null check (rate_bps between 0 and 10000),  -- 15% = 1500
+  valid_from  date not null,
+  valid_to    date,
+  created_by  uuid references auth.users(id),
+  created_at  timestamptz not null default now(),
+  check (valid_to is null or valid_to > valid_from),
+  exclude using gist (store_id with =, daterange(valid_from, valid_to) with &&)
+);
+create or replace function fin.store_rate_bps(p_store uuid, p_date date) returns int
+language sql stable as $$
+  select rate_bps from fin.store_commission_rates
+   where store_id = p_store and valid_from <= p_date and (valid_to is null or valid_to > p_date)
+$$;
+
+-- contas bancárias: cadastradas/alteradas durante o evento; nunca apagadas
+create table fin.bank_accounts (
+  id              bigserial primary key,
+  event_id        uuid not null references public.events(id) on delete restrict,
+  account_id      bigint not null unique references fin.accounts(id) on delete restrict,
+  bank_name       text not null,
+  branch          text,
+  number          text not null,
+  holder_name     text not null,
+  holder_document text not null,
+  archived_at     timestamptz,
+  created_by      uuid references auth.users(id),
+  created_at      timestamptz not null default now()
+);
+create trigger bank_accounts_no_delete before delete on fin.bank_accounts
+  for each row execute function fin.forbid_mutation();
+-- alterações ficam no audit.log (trigger audit.trg da seção 3.5)
+
+-- configuração do evento: caixa mínimo
+create table fin.event_settings (
+  event_id              uuid primary key references public.events(id) on delete restrict,
+  min_cash_cents        bigint not null default 100000 check (min_cash_cents >= 0),
+  updated_by            uuid references auth.users(id),
+  updated_at            timestamptz not null default now()
+);
+
+-- falta de repasse por loja = saldo em aberto da conta "A receber loja"
+create view fin.v_store_pending as
+select a.event_id, a.counterparty as store, a.code, a.name, b.balance_cents as pending_cents
+  from fin.accounts a
+  join fin.v_account_balances b on b.account_id = a.id
+ where a.counterparty like 'store:%' and b.balance_cents > 0;
+```
+
+**Alerta de falta de repasse**: no fechamento de cada dia, toda loja com `pending_cents > 0` referente a dias anteriores gera alerta (valor e dias em aberto, pela ordem FIFO) e aparece no wizard do próximo caixa para cobrança.
 
 ## 5. Conciliação em três pontas
 

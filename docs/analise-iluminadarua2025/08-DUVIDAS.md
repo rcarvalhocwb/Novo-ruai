@@ -8,13 +8,13 @@ A análise marcou como **[DÚVIDA]** tudo o que o código não permite afirmar. 
 2. ~~**Desconto**~~ **Respondida:** só em campanhas. *Técnico, para a Zet:* `totalValue` já vem com o desconto aplicado?
 3. ~~**Estorno Zet (taxa)**~~ **Respondida:** o evento devolve só o preço do ingresso (R$ 30,00); a taxa não afeta o evento. Na bilheteria o estorno é sempre total. *Técnico, para a Zet:* o webhook ES pode trazer só parte dos vouchers do pedido? (O desenho já trata os dois casos.)
 4. ~~**Comissão de foods**~~ **Respondida:** a loja paga a comissão ao evento. O repasse é receita do evento.
-5. **Ajuste de comissão:** o wizard permite receber um valor menor que o esperado ("desconto acordado"). Isso é **desconto concedido** (despesa) ou **perda**? Quem pode autorizar?
+5. ~~**Ajuste de comissão**~~ **Respondida:** percentual individual por loja, pagamento diário; pagamento a menor é **falta de repasse**, com alerta para pagar no próximo caixa.
 6. **Ingressos físicos:** o preço dos cartões inteira, meia e social é fixo por evento/dia? Há venda de produtos em todos os caixas?
-7. **Caixa mínimo:** R$ 1.000 é regra fixa ou configurável por evento?
+7. ~~**Caixa mínimo**~~ **Respondida:** configurado por evento.
 8. ~~**Dia operacional**~~ **Respondida:** online vira à meia-noite; bilheteria termina quando o caixa daquele dia é fechado.
 9. ~~**Aprovação**~~ **Respondida:** o relatório é assinado por duas pessoas designadas durante o evento, trocáveis a qualquer momento. Depois do fechamento, a sangria vai para conta bancária ou para pagamento de despesas.
-9a. **Fundo de troco:** o valor é o mesmo para os 9 caixas ou definido caixa a caixa? Ele fica na tesouraria de um dia para o outro ou também entra na sangria?
-10. **Contas bancárias:** o código cita `principal` e `fabio` (`fabio_transactions`). Quais contas existem, e alguma é pessoal?
+9a. ~~**Fundo de troco**~~ **Respondida em parte:** o valor pode variar por operador. *Ainda aberto:* depois de devolvido, o fundo fica guardado na tesouraria para o dia seguinte ou entra na sangria junto com a venda?
+10. ~~**Contas bancárias**~~ **Respondida:** cadastradas e alteradas durante o evento, com transferência entre contas. *Observação:* se alguma conta for de pessoa física (o código antigo cita `fabio`), convém registrar o titular para a prestação de contas.
 
 ## Para a Zet (técnico)
 

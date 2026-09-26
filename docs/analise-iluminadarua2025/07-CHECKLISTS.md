@@ -9,7 +9,7 @@
 - [ ] Extrato bancário (OFX) importado até o dia.
 
 **Bilheteria (cada um dos 9 caixas)**
-- [ ] Fundo de troco entregue e registrado na abertura (Tesouraria → Caixa N).
+- [ ] Fundo de troco entregue e registrado na abertura, com o operador e o valor dele (Tesouraria → Caixa N).
 - [ ] Cartões de ingresso iniciais e restantes contados.
 - [ ] Dinheiro contado por **duas pessoas**, valor declarado; fundo de troco devolvido junto com a venda.
 - [ ] Estornos do caixa (sempre totais) registrados com o meio de pagamento.
@@ -23,8 +23,9 @@
 
 **Foods**
 - [ ] Vendas de todas as lojas lançadas.
-- [ ] Comissões calculadas pela regra única (sem edição manual do valor).
-- [ ] Repasses recebidos alocados (FIFO); excedente em crédito da loja.
+- [ ] Comissões calculadas com o percentual vigente de cada loja (sem edição manual do valor).
+- [ ] Repasse de cada loja registrado pelo valor **efetivamente recebido**; alocado FIFO; excedente em crédito da loja.
+- [ ] Lojas com **falta de repasse** (pagaram menos) listadas com valor e dias em aberto, para cobrança no próximo caixa.
 
 **Catraca**
 - [ ] Entradas × ingressos válidos do dia; divergência acima de 5% justificada.
@@ -34,7 +35,7 @@
 - [ ] Os 9 caixas fechados.
 - [ ] Assinatura das **duas pessoas designadas** (vigentes no momento da assinatura) sobre o mesmo conteúdo.
 - [ ] Dia travado; PDF com hash e QR arquivado.
-- [ ] Sangria registrada: Tesouraria → Banco (depósito) ou Tesouraria → Despesa (com comprovante).
+- [ ] Sangria registrada: Tesouraria → conta bancária escolhida (depósito) ou Tesouraria → Despesa (com comprovante). Transferências entre contas também registradas.
 
 ## B. Segurança para produção
 
