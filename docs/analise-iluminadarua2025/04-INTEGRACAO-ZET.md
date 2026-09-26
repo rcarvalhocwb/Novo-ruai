@@ -23,7 +23,7 @@ POST /webhook   // header: x-webhook-signature = hex(HMAC-SHA256(WEBHOOK_SECRET,
 }
 ```
 
-**Para confirmar com a Zet** (ver `08-DUVIDAS.md`): se a assinatura existe e é enviada sempre; se há timestamp ou id de entrega; a política de reenvio (quantas vezes, intervalo, o que conta como sucesso); se a ordem de entrega é garantida; os IPs de origem; se existe **API de consulta** de pedidos ou relatório exportável; e a semântica de `discount` e se a Zet desconta a taxa do evento no estorno. (A regra da taxa já está confirmada: acréscimo de 10% sobre o preço do ingresso, retido pela Zet.)
+**Para confirmar com a Zet** (ver `08-DUVIDAS.md`): se a assinatura existe e é enviada sempre; se há timestamp ou id de entrega; a política de reenvio (quantas vezes, intervalo, o que conta como sucesso); se a ordem de entrega é garantida; os IPs de origem; se existe **API de consulta** de pedidos ou relatório exportável; a semântica de `discount` e se existe estorno parcial. (Já confirmado: a taxa é um acréscimo de 10% sobre o preço do ingresso, retido pela Zet, e no estorno o evento devolve só o preço do ingresso.)
 
 ## 2. Arquitetura
 

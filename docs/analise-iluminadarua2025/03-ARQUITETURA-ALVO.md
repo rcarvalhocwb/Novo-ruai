@@ -164,7 +164,7 @@ No SQL, a mesma regra: `(amount_cents * bps + 5000) / 10000` em `bigint`.
 | Repasse da loja (FIFO) | Banco / Caixa | A receber loja N (excedente em Crédito de loja) |
 | Repasse à administração | Repasses à administração | Banco |
 
-A **taxa da Zet não entra no livro-razão**: é um acréscimo pago pelo cliente e retido pela própria Zet, então nunca passa pelo caixa do evento. Bruto e taxa ficam registrados na venda (`sales.zet_orders`) para conferência. Se a Zet descontar a taxa do evento em algum estorno, isso vira um lançamento próprio (D Despesa taxa Zet em estorno / C A receber Zet), identificado na conciliação.
+A **taxa da Zet não entra no livro-razão**: é um acréscimo pago pelo cliente e retido pela própria Zet, então nunca passa pelo caixa do evento. Bruto e taxa ficam registrados na venda (`sales.zet_orders`) para conferência. No estorno, o evento devolve só o preço do ingresso (R$ 30,00); a taxa continua sendo assunto entre cliente e Zet e nunca afeta o saldo do evento.
 
 A pergunta "**quanto a Zet ainda me deve?**" passa a ser o **saldo da conta 1.2.01**. "Quanto a loja N deve?" é o saldo da 1.2.1N. "Quanto deveria haver no caixa 3?" é o saldo da 1.1.01-3. **A conciliação vira comparar saldo de conta com extrato.**
 

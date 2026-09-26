@@ -6,7 +6,7 @@ A análise marcou como **[DÚVIDA]** tudo o que o código não permite afirmar. 
 
 1. ~~**Taxa da Zet**~~ **Respondida:** acréscimo de 10% sobre o preço do ingresso, pago pelo cliente e retido pela Zet (R$ 30,00 + R$ 3,00 = R$ 33,00 no payload). A receita do evento é o líquido.
 2. **Desconto:** `totalValue` já vem com o desconto aplicado? O webhook antigo grava `total_amount = totalValue − discount`, mas `gross_amount = totalValue`.
-3. **Estorno Zet:** no estorno, o evento devolve só o preço do ingresso (R$ 30,00) ou a Zet também desconta a taxa (R$ 3,00) do repasse do evento? Existe estorno **parcial** (só alguns ingressos do pedido)?
+3. ~~**Estorno Zet (taxa)**~~ **Respondida:** o evento devolve só o preço do ingresso (R$ 30,00); a taxa não afeta o evento. **Ainda aberto:** existe estorno **parcial** (só alguns ingressos do pedido)?
 4. ~~**Comissão de foods**~~ **Respondida:** a loja paga a comissão ao evento. O repasse é receita do evento.
 5. **Ajuste de comissão:** o wizard permite receber um valor menor que o esperado ("desconto acordado"). Isso é **desconto concedido** (despesa) ou **perda**? Quem pode autorizar?
 6. **Ingressos físicos:** o preço dos cartões inteira, meia e social é fixo por evento/dia? Há venda de produtos em todos os caixas?

@@ -115,7 +115,7 @@ Consequências:
 |---|-------|
 | R1 | Valores de venda online são os **exatos recebidos da Zet**. A taxa nunca é recalculada. A **receita do evento é o líquido** (`totalValue − totalTax`); a taxa é da Zet. |
 | R2 | Idempotência por `order.uuid`: um pedido corresponde a uma venda. |
-| R3 | Estorno Zet é do **pedido inteiro** e cancela todos os vouchers. |
+| R3 | Estorno Zet é do **pedido inteiro** e cancela todos os vouchers. O evento devolve **só o preço do ingresso** (o líquido); a taxa não afeta o evento. |
 | R4 | Cortesia = venda com valor zero, contada como ingresso e fora da receita. |
 | R5 | Comissão de food = `vendas × %` da loja, **arredondada a centavos uma única vez** (hoje isso é inconsistente). |
 | R6 | A **loja paga a comissão ao evento**. O repasse de food é distribuído **FIFO** entre os dias pendentes. |
