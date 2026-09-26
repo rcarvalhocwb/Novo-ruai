@@ -101,7 +101,9 @@ Conferido contra o backup:
 2. A conta "A receber Zet" pode ficar **negativa** (o evento deve à Zet). O relatório tem de mostrar isso claramente.
 3. Se algum voucher contestado **já tinha sido usado** (Lista de ingressos), a pessoa entrou e o evento perdeu o valor. Esses casos entram no relatório de fraude, para decidir se vale contestar com a Zet.
 
-## 5. Achado: vendas na máquina da Zet (`PIX_MAQUINA`, `CREDITO_MAQUINA`)
+## 5. Achado: vendas na máquina da Zet (`PIX_MAQUINA`, `CREDITO_MAQUINA`, `DEBITO_MAQUINA`)
+
+> Atualização: o export de Transações confirmou **1.161 pedidos, R$ 60.952,50 líquidos**, e o robô vai importá-los. Ver `15-IMPORTACAO-EXPORT-ZET.md`.
 
 Foram 2.397 ingressos vendidos em **máquinas da própria Zet**, com tipo `FISICO` no extrato e taxa de 10%. Nenhum veio por webhook: o backup só tem `PIX`, `CREDITO`, `CORTESIA` e `CREDITO_LINK`. Nos exemplos do vídeo (R$ 19,80, sem nome do comprador), parecem vendas de balcão.
 

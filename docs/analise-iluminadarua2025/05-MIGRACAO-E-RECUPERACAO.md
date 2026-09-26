@@ -28,6 +28,7 @@ O sistema antigo ainda tem funções públicas que apagam dados (S-01 a S-07). A
 | F9 | **Validações de catraca** (`access_events`, middleware) | Vouchers usados | Média; prova de que o ingresso existiu | Dump e logs do middleware |
 | F10 | Arquivos `data/imports/*.json` e planilhas manuais | Importações manuais de novembro | Baixa a média | Repositório |
 | F11 | Anotações físicas: contagem de caixa, borderôs | Declarado em papel | Baixa a média | Físico |
+| F12 | **Export de Transações do painel Zet** (`data.xlsx`) | Todos os pedidos pagos do evento, inclusive **máquina da Zet**, primeira semana e webhooks nunca recebidos. Fecha no centavo com a receita líquida do painel | Máxima para vendas Zet | Botão Exportar (ver `15-IMPORTACAO-EXPORT-ZET.md`) |
 
 ## 2. Processo de reconstrução
 
@@ -53,7 +54,7 @@ create table recovery.source_files (
 create table recovery.rows (
   id bigserial primary key,
   file_id bigint not null references recovery.source_files(id),
-  source text not null,                   -- F1..F11
+  source text not null,                   -- F1..F12
   natural_key text,                       -- order_uuid, id da transação PagBank, FITID do OFX...
   business_date date,
   amount_cents bigint,

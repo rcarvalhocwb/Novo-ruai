@@ -25,10 +25,11 @@ Cada fase entrega algo utilizável e tem **critério de aceite objetivo**. Uma f
 - Borda com WAF e rate limit.
 - Job diário de conciliação Zet × sistema.
 - Robô diário no painel da Zet (vendas, estornos, borderô, repasses), com snapshot e hash, e conciliação automática (`13-ROBO-PAINEL-ZET.md`). Baixa os exports de Transações, Lista de ingressos e Extrato; só leitura, com lista de botões permitidos (`14-MAPEAMENTO-PAINEL-ZET.md`).
+- Importação diária do export de Transações: cria as vendas da **máquina da Zet** e as de webhook perdido, pelo mesmo caminho do webhook; pedido que some do export vira exceção (`15-IMPORTACAO-EXPORT-ZET.md`).
 - Lançamento automático de contestações (chargeback / PIX MED) e taxas de saque a partir do extrato da Zet.
 - Importação diária do borderô da Zet (validações) e relatório diário de público, ticket médio e previsão; extrato conta-corrente Zet (`12-RELATORIO-DIARIO-E-ACERTO-ZET.md`).
 
-**Aceite:** os testes de webhook passam (token, duplicata, CP repetido com valor diferente, ES parcial, ES antes de CP, CP depois de ES, 50 CPs concorrentes geram 1 venda, **banco desligado durante o teste sem perder nenhum webhook**); teste de carga de 200 req/s sem degradar o banco; um dia de homologação com o relatório Zet × sistema **R$ 0,00**.
+**Aceite:** os testes de webhook passam (token, duplicata, CP repetido com valor diferente, ES parcial, ES antes de CP, CP depois de ES, 50 CPs concorrentes geram 1 venda, **banco desligado durante o teste sem perder nenhum webhook**); teste de carga de 200 req/s sem degradar o banco; um dia de homologação com o relatório Zet × sistema **R$ 0,00**; importação do export de 2025 reproduz a ponte da seção 2 de `15-IMPORTACAO-EXPORT-ZET.md` no centavo.
 
 ## Fase 3: Bilheteria e fechamento (2 semanas)
 - Sessões de caixa (abertura, fechamento, contagem) gerando lançamentos.

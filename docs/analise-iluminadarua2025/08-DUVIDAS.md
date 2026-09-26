@@ -28,7 +28,8 @@ A análise marcou como **[DÚVIDA]** tudo o que o código não permite afirmar. 
 14. Qual é a política de **reenvio** (quantas tentativas, intervalo, o que conta como sucesso)? O backup mostra reenvios (1.256 pedidos com 2 ou mais entregas), mas 72 webhooks que deram erro de conexão nunca chegaram de novo com sucesso.
 15. Existe **API de consulta** de pedidos (por período e por uuid) ou só export do painel?
 15a. **(Do mapeamento do painel, `14-MAPEAMENTO-PAINEL-ZET.md`, seção 7):** usuário só de leitura; diferença de 20 ingressos entre os dashboards; data de liberação 30/06/2026 nas contestações PIX; prazos de contestação; webhook para contestação; filtro de data e formato dos exports; uso futuro das máquinas da Zet.
-15b. **Para o dono do evento:** quem operava as **máquinas da Zet** (`PIX_MAQUINA`/`CREDITO_MAQUINA`, 2.397 ingressos) e onde? Eram vendas da bilheteria?
+15b. **Para o dono do evento:** quem operava as **máquinas da Zet** (1.161 pedidos, 2.397 ingressos, R$ 60.952,50 líquidos, sempre entre 18h e 22h) e em que guichê? Eram vendas da bilheteria? *(Já confirmado: essas vendas não chegam por webhook e o robô deve importá-las.)*
+15c. **(Do export, `15-IMPORTACAO-EXPORT-ZET.md`, seção 6):** 81 pedidos PIX pagos sem data de confirmação; 23 pedidos que saíram do export sem webhook de estorno; 187 vendas sem webhook; export com cancelados; vínculo voucher → pedido; webhook e número de série para a máquina.
 
 16. Existe relatório de **composição de cada repasse** (quais pedidos entraram)?
 
