@@ -9,6 +9,7 @@ Levantamento **somente leitura**, feito pelos conectores do Supabase e da Cloudf
 | Rua Iluminada | `tzqriohyfazftfulwcuj` | sa-east-1 | Ativo, Postgres 17, 546 MB | **Sistema de 2025: só pesquisa e fonte da migração.** Não alterar |
 | iluminada | `irjlrsiudyfezdalgkeh` | sa-east-1 | Inativo | Desconhecido (pergunta D-13) |
 | `ruai-2026-hml` | — | sa-east-1 | **Não criado**: o conector expirou (timeout de 60 s) nas duas tentativas | Homologação do sistema novo |
+| (nome = e-mail do dono da organização) | `pophyumvrwjxuufltzey` | **ca-central-1** (Canadá) | Criado pelo dono em 26/09, vazio | **Não usar**: a região não pode ser mudada depois de criado. Decisão: recriar em `sa-east-1`; este, vazio, pode ser apagado |
 
 A organização é **Pro**. Uma conta de outra pessoa é dona dela (D-14).
 
