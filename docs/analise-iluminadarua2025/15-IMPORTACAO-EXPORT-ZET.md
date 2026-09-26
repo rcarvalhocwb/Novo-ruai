@@ -81,7 +81,19 @@ flowchart TD
 7. **Lançamento no dia certo:** uma venda descoberta hoje, mas paga num dia já fechado, **não reabre** o dia. Ela entra como "venda de dia anterior identificada na conciliação" no relatório de hoje, e o dia original ganha uma nota.
 
 ### Ingressos (vouchers) das vendas importadas
-O export de Transações é **por pedido**: não traz quantidade, tipo de ingresso nem voucher. Para a venda da máquina e para os webhooks perdidos, os itens vêm da **Lista de ingressos** (export da tela ao lado), que tem voucher, tipo, sessão, data do evento e data de uso. O voucher contém o número do pedido (`1198284548351` → pedido `198284`). **Falta confirmar** com o export da Lista de ingressos que esse vínculo vale para todas as vendas, inclusive as da máquina.
+O export de Transações é **por pedido**: não traz quantidade, tipo de ingresso nem voucher, e nenhuma planilha traz o vínculo pedido → vouchers. Esse vínculo está no botão **Detalhes** (ícone ⓘ) de cada linha da tela Transações: ele abre o pedido com os vouchers e os detalhes de cada um (tipo, como meia ou inteira, sessão e data). Confirmado pelo dono do evento.
+
+Por isso o robô completa os itens assim:
+1. **Só para os pedidos que precisam**: vendas criadas pelo export (`items_pending = true`), ou seja, máquina da Zet e webhooks perdidos. Pedido que veio por webhook já tem os vouchers no payload. No dia a dia são dezenas de pedidos, não milhares. A carga inicial de 2025 é de cerca de 1.565 pedidos (1.161 da máquina, 187 sem webhook, 136 da primeira semana e 81 sem data), feita em lotes, com pausa entre as aberturas.
+2. **Como ler:** a tela Transações busca pelo `uuid`, e o robô abre Detalhes. Assim como na listagem, o robô tenta primeiro **capturar o JSON** que a página carrega ao abrir o detalhe (que tende a ter o mesmo formato do `eventTicketCodes` do webhook). Se não houver JSON, lê o conteúdo da janela. Detalhes e Fechar entram na lista de botões permitidos; nada mais é clicado (regra R27).
+3. **Validação antes de gravar:**
+   - a soma dos vouchers tem de fechar com o total do pedido no export, pela tabela de preços do dia e da sessão;
+   - todo tipo de ingresso tem de existir no de-para (`zet_ticket_type_map`); tipo desconhecido vira exceção;
+   - o voucher não pode pertencer a outro pedido;
+   - se algo falhar, o pedido continua `items_pending` e vira exceção. Nada é gravado pela metade.
+4. **Gravação:** os vouchers entram em `sales.zet_order_items` pelo mesmo caminho do webhook, com `source = 'zet_painel'`, e o pedido passa a `items_pending = false`. O conteúdo aberto (JSON ou HTML) é guardado com hash como evidência.
+
+A **Lista de ingressos** continua sendo a fonte da **data de uso** (validação) de todos os vouchers. O voucher contém o número do pedido (`1198284548351` → pedido `198284`), o que serve de conferência cruzada.
 
 Enquanto os itens não chegam, o pedido fica com `items_pending = true`: o **valor já entra** no financeiro (o dinheiro é certo), e o público e o ticket médio marcam o dia como incompleto.
 
@@ -170,5 +182,5 @@ Se os operadores da bilheteria venderam na máquina da Zet, essa venda aparece e
 2. Os **23 pedidos que saíram do export sem webhook de estorno** (lista em `dados/zet-export-x-webhooks.csv`, categoria `fora_do_export_sem_webhook_ES`): foram cancelados, estornados ou contestados? Em que data?
 3. Por que **187 vendas online não geraram webhook** (principalmente em 09/11, 18/11, 08/12, 13/12, 18/12 e 21/12)? Existe log de envio?
 4. O export pode incluir pedidos **cancelados e estornados** (com a data), e não só os pagos?
-5. A Lista de ingressos exporta o **número ou o uuid do pedido** de cada voucher?
+5. ~~Vínculo voucher → pedido~~ Resolvido pelo botão Detalhes da tela Transações (seção 3). Existe um endpoint ou export que já traga os vouchers de cada pedido, para evitar abrir um por um?
 6. As vendas da máquina podem gerar webhook? A Zet informa o **número de série da máquina**?

@@ -64,7 +64,7 @@ Em qualquer das duas, **provar que leu tudo**:
 | Situação | Ação automática |
 |---|---|
 | Pedido igual no painel e no sistema | Marca a venda como **confirmada pela Zet** |
-| Pedido **só no painel** (webhook perdido) | Cria a venda pelo mesmo fluxo do webhook, com origem `zet_panel`, e registra no relatório do dia |
+| Pedido **só no painel** (webhook perdido ou máquina da Zet) | Cria a venda pelo mesmo fluxo do webhook, com origem `zet_panel`, e registra no relatório do dia. Os vouchers (tipo, sessão, data) vêm do botão **Detalhes** do pedido na tela Transações |
 | Pedido **só no sistema** | Exceção "venda sem confirmação da Zet" (possível envio falso, como o teste do Postman que entrou como venda real) |
 | Estorno no painel sem webhook ES | Aplica o estorno (por voucher) com origem `zet_panel` |
 | Valor ou taxa diferente | Exceção para análise; **nunca** sobrescreve sozinho (lembrando o caso da taxa errada da meia-entrada) |

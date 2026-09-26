@@ -118,6 +118,7 @@ Foram 2.397 ingressos vendidos em **máquinas da própria Zet**, com tipo `FISIC
 | 3 | Evento → Extrato | Exportar | `recon.zet_statement_lines`: créditos, contestações, saques e taxas |
 | 4 | Evento → Dashboard | Ler os cartões de total (sem exportar) | Totais de controle da execução: a soma do que foi importado tem de bater com o painel |
 | 5 | Evento → Dashboard | Exportar o Borderô de contestações | Evidência das contestações |
+| 6 | Evento → Transações → **Detalhes** (ⓘ) | Abrir só os pedidos sem itens (máquina da Zet, webhook perdido) e ler os vouchers: tipo (meia, inteira…), sessão e data | `sales.zet_order_items`, com `source = 'zet_painel'` (`15-IMPORTACAO-EXPORT-ZET.md`, seção 3) |
 
 **O robô só lê.** No painel existem botões que **mexem em dinheiro e em ingressos**: **Solicitar saque**, **Nova venda** e **Validar** (na Lista de ingressos). O robô:
 - não clica em nada além de navegação, filtros e Exportar, com uma **lista de botões permitidos** no código;
