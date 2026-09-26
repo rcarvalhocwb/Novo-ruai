@@ -31,6 +31,8 @@ A análise marcou como **[DÚVIDA]** tudo o que o código não permite afirmar. 
 15b. **Para o dono do evento:** quem operava as **máquinas da Zet** (1.161 pedidos, 2.397 ingressos, R$ 60.952,50 líquidos, sempre entre 18h e 22h) e em que guichê? Eram vendas da bilheteria? *(Já confirmado: essas vendas não chegam por webhook e o robô deve importá-las.)*
 15c. **(Do export, `15-IMPORTACAO-EXPORT-ZET.md`, seção 6):** 81 pedidos PIX pagos sem data de confirmação; 23 pedidos que saíram do export sem webhook de estorno; 187 vendas sem webhook; export com cancelados; vínculo voucher → pedido; webhook e número de série para a máquina.
 
+15d. **Integração com as catracas (`16-INTEGRACAO-CATRACAS.md`, seção 3), para o dono do evento:** (a) quem recebe o webhook da Zet: o sistema novo (recomendado) ou o relé do projeto das catracas; (b) a catraca dá baixa na Zet quando lê um QR, ou não (a regra R27 diz que nada é alterado na Zet); nos dias normais a catraca aceita QR da Zet?; (c) a venda de balcão passa a ser registrada no PC das catracas, com guichê, preço e meio de pagamento (habilita o modo por guichê)?
+
 16. Existe relatório de **composição de cada repasse** (quais pedidos entraram)?
 
 17a. O **borderô** pode ser exportado **por voucher** (código + data e hora da validação), e não só total por tipo? Existe API de validações?

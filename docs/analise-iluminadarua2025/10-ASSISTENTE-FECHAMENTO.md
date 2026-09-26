@@ -49,7 +49,7 @@ Hoje **não existe controle de quantos ingressos cada guichê vendeu**. Por isso
 - Cada guichê fecha só o **dinheiro** (gaveta) e a **maquininha**. Não há contagem de ingressos por guichê.
 - Os ingressos são conferidos **uma vez, no fechamento do dia**, para os 9 guichês juntos:
   - **receita da bilheteria** = Σ dos 9 guichês (dinheiro + cartão + PIX − estornos);
-  - **receita esperada pela catraca** = Σ (cartões RFID **distintos** que entraram no dia, por tipo × preço do tipo). Reentrada do mesmo cartão conta uma vez; cortesia conta R$ 0,00;
+  - **receita esperada pela catraca** = Σ (**usos consumidos** na catraca no dia, pela categoria **fotografada na passagem** × preço do tipo). Cortesia conta R$ 0,00. **Não se contam cartões distintos**: o cartão da bilheteria é um recipiente, revendido várias vezes no mesmo dia (ciclo de uns 20 minutos), então um cartão pode ser três entradas pagas. A tentativa repetida no mesmo cartão já é barrada pela urna e pelo intervalo de reuso, e só a passagem consumida entra na conta (ver `16-INTEGRACAO-CATRACAS.md`);
   - as duas têm de bater. A diferença aparece em valor e em %.
 - O que explica uma diferença: cartão vendido que ainda não passou na catraca (diferença positiva, normal e pequena), tipo errado (meia vendida como inteira), venda sem registro de pagamento, ou cortesia não registrada.
 - Limites (configuráveis): até 5% alerta; acima de 10% crítico. É uma **conferência**: nunca altera o valor do caixa, que é sempre o contado e o registrado na maquininha.
@@ -187,7 +187,8 @@ No modo `por_guiche`, a receita dos ingressos (`tickets_revenue_cents`) é compa
 ```sql
 -- conferência da bilheteria inteira com a catraca (modo 'total'; no modo 'por_guiche' também roda)
 -- receita_guiches: Σ das sessões do dia (dinheiro + cartão + PIX − estornos), vinda do livro-razão
--- esperado_catraca: cartões RFID distintos que entraram no dia × preço do tipo
+-- esperado_catraca: usos consumidos da bilheteria no dia, pela categoria fotografada na passagem × preço do tipo
+-- (o cartão é revendido várias vezes no dia: contar cartões distintos subconta)
 create or replace function fin.box_office_check(p_event uuid, p_day date)
 returns table (
   category             text,
@@ -201,13 +202,13 @@ returns table (
 )
 language sql stable as $$
   with entr as (
-    select c.category, count(distinct ae.card_id)::int as entries, pr.unit_price_cents
-      from access.access_events ae
-      join access.rfid_cards c on c.id = ae.card_id
-      join fin.box_office_prices pr on pr.event_id = p_event and pr.category = c.category
+    select a.category, count(*)::int as entries, pr.unit_price_cents
+      from access.ticket_use_attempts a            -- espelho do que a borda das catracas sobe
+      join fin.box_office_prices pr on pr.event_id = p_event and pr.category = a.category
                                    and p_day <@ pr.valid_during
-     where ae.event_id = p_event and ae.business_date = p_day and ae.allowed
-     group by c.category, pr.unit_price_cents
+     where a.event_id = p_event and a.provider = 'bilheteria' and a.outcome = 'consumido'
+       and a.business_date = p_day
+     group by a.category, pr.unit_price_cents
   ), rev as (
     select coalesce(sum(case p.side when 'D' then p.amount_cents else -p.amount_cents end), 0) as cents
       from fin.postings p
@@ -227,7 +228,7 @@ language sql stable as $$
     from entr, rev, tot, cfg
 $$;
 ```
-(A receita é crédito, por isso o sinal invertido. Os nomes `access.*` e `fin.box_office_prices` seguem o módulo de catraca/RFID migrado na fase 6.)
+(A receita é crédito, por isso o sinal invertido. `access.ticket_use_attempts` é o espelho das tentativas que o sistema das catracas (Conexão Topdata) sobe para a nuvem; ver `16-INTEGRACAO-CATRACAS.md`.)
 
 ## 7. Integração com as maquininhas PagBank (uma por guichê)
 
@@ -270,7 +271,7 @@ A ideia de usar a catraca para conferir as vendas está certa: **toda entrada te
 |---|---|---|
 | 1. Por ingresso | Cada passagem autorizada corresponde a um cartão RFID vendido naquele dia ou a um voucher válido para aquela data | Passagem sem ingresso = alerta (possível fraude ou cartão não devolvido) |
 | 2. Por tipo (bilheteria, só no modo por guichê) | Entradas por tipo × cartões vendidos por tipo nos 9 guichês | Iguais, descontadas as reentradas |
-| 3. Por valor (**só bilheteria, total dos 9 guichês**; é a conferência principal no modo total) | Σ (cartões RFID distintos que entraram, por tipo × preço do tipo) × receita dos 9 guichês (dinheiro + cartão + PIX − estornos) | Igual; a diferença aponta cartão vendido que não entrou, tipo errado (meia vendida como inteira) ou venda sem registro. Nunca é por guichê, a não ser no modo por guichê |
+| 3. Por valor (**só bilheteria, total dos 9 guichês**; é a conferência principal no modo total) | Σ (usos consumidos da bilheteria, pela categoria fotografada na passagem × preço do tipo) × receita dos 9 guichês (dinheiro + cartão + PIX − estornos) | Igual; a diferença aponta cartão vendido que não entrou, tipo errado (meia vendida como inteira) ou venda sem registro. Nunca é por guichê, a não ser no modo por guichê |
 | 4. Online por data de visita | Vouchers usados no dia × vouchers com visita no dia | Não comparecimento é normal; entrada sem voucher válido, não |
 
 **Importante (ver `11-VENDA-X-ENTRADA.md`)**: a catraca é um controle **de pessoas**, não de dinheiro. O nível 3 vale **só para a bilheteria**, porque ali a compra e a entrada acontecem no mesmo dia; e mesmo assim é uma conferência que gera alerta, **nunca** um valor que entra ou sai do caixa. No online, 39% dos ingressos são usados em outro dia, então entradas online **nunca** são convertidas em valor no fechamento.

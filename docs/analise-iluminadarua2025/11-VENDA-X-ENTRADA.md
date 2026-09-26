@@ -68,7 +68,7 @@ A catraca continua sendo muito útil, com as perguntas certas:
 | Conferência | Como | O que revela |
 |---|---|---|
 | Entrada sem ingresso | Toda passagem autorizada tem de corresponder a um cartão RFID vendido **naquele dia** na bilheteria ou a um voucher online **válido para aquela data** | Fraude, cartão não devolvido, voucher repetido |
-| Bilheteria: total dos 9 guichês | Receita somada dos 9 guichês × (entradas RFID distintas de cada tipo × preço do tipo). No modo opcional "por guichê", também cartões vendidos por tipo × entradas por tipo | Tipo errado (meia vendida como inteira), cartão que não passou na catraca, venda sem registro |
+| Bilheteria: total dos 9 guichês | Receita somada dos 9 guichês × (usos consumidos na catraca por categoria × preço do tipo). No modo opcional "por guichê", também cartões vendidos por tipo × entradas por tipo | Tipo errado (meia vendida como inteira), cartão que não passou na catraca, venda sem registro |
 | Online: comparecimento | Vouchers usados no dia × vouchers com visita marcada para o dia; entradas online separadas em "compradas hoje" e "compradas antes" | No-show, lotação, previsão para os próximos dias |
 
 **Somente na bilheteria** faz sentido comparar entradas com dinheiro, porque ali a compra e a entrada acontecem no mesmo dia e o cartão RFID tem tipo. Mesmo assim, é uma **conferência de quantidade**, que aponta divergência para investigar. **Ela nunca altera o valor do caixa.** O dinheiro do guichê é o que foi contado e o que a maquininha registrou.

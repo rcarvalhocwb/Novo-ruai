@@ -379,7 +379,7 @@ def build(out):
 
     # 1.2 bilheteria x catraca (total dos 9 guichês)
     s.append(P("1.2 Bilheteria × catraca (total dos 9 guichês)", S_H2))
-    data = [[H("Tipo do cartão RFID"), HR("Entradas (cartões distintos)"), HR("Preço"), HR("Valor esperado")]]
+    data = [[H("Tipo do cartão RFID"), HR("Entradas (usos consumidos)"), HR("Preço"), HR("Valor esperado")]]
     for t, n in zip(TIPOS, bil_entr_q):
         data.append([P(t), R(num(n)), R(brl(PRECO[t])), R(brl(n * PRECO[t]))])
     data.append([B("Esperado pela catraca"), RB(num(bil_entr)), R(""), RB(brl(val_bil_entr))])
@@ -391,7 +391,7 @@ def build(out):
     s.append(table(data, [W * x for x in (.40, .22, .16, .22)], total_rows=3))
     s.append(Spacer(1, 3))
     s.append(P("Hoje não há controle de quantos ingressos cada guichê vendeu, por isso a conferência é da <b>bilheteria inteira</b>: a soma dos 9 guichês "
-               "tem de bater com as entradas RFID do dia × preço do tipo (reentrada do mesmo cartão conta uma vez). Diferença positiva pequena é normal "
+               "tem de bater com as entradas RFID do dia × preço do tipo (conta cada uso consumido: o cartão é revendido várias vezes no dia, então não se contam cartões distintos). Diferença positiva pequena é normal "
                "(cartão vendido que ainda não passou); acima de 5% é alerta e acima de 10% é crítico. É uma conferência: o valor do caixa é sempre o contado "
                "e o da maquininha. <b>Modo opcional \"por guichê\"</b>: se o evento controlar os cartões entregues a cada guichê, esta tabela aparece também "
                "em cada guichê, junto com a coluna de ingressos vendidos.", S_SMALL))
@@ -452,7 +452,7 @@ def build(out):
     s.append(Spacer(1, 3))
     s.append(P(f"Online com visita marcada para hoje: {num(on_previstos)} ingressos · validados {num(on_ent)} · <b>não validados {num(on_nao_valid)}</b> "
                f"(não compareceu ou falha de validação; o valor continua sendo do evento). "
-               f"Bilheteria: {num(bil_entr)} cartões RFID distintos passaram na catraca; a conferência com a receita dos guichês está na seção 1.2.", S_SMALL))
+               f"Bilheteria: {num(bil_entr)} entradas de cartão RFID consumidas na catraca; a conferência com a receita dos guichês está na seção 1.2.", S_SMALL))
 
     s.append(P("6. Ticket médio (sobre quem entrou)", S_H1))
     data = [[H("Indicador"), HR("Valor pago pelos ingressos de quem entrou"), HR("Pessoas"), HR("Ticket médio"), HR("Sem cortesias")],

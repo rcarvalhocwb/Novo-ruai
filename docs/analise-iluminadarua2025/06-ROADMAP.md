@@ -26,6 +26,7 @@ Cada fase entrega algo utilizável e tem **critério de aceite objetivo**. Uma f
 - Job diário de conciliação Zet × sistema.
 - Robô diário no painel da Zet (vendas, estornos, borderô, repasses), com snapshot e hash, e conciliação automática (`13-ROBO-PAINEL-ZET.md`). Baixa os exports de Transações, Lista de ingressos e Extrato; só leitura, com lista de botões permitidos (`14-MAPEAMENTO-PAINEL-ZET.md`).
 - Importação diária do export de Transações: cria as vendas da **máquina da Zet** e as de webhook perdido, pelo mesmo caminho do webhook; pedido que some do export vira exceção (`15-IMPORTACAO-EXPORT-ZET.md`).
+- API para o sistema das catracas (Conexão Topdata): ingressos e configuração descem, tentativas, vendas de balcão e saúde sobem, com segredo por PC e testes de contrato compartilhados (`16-INTEGRACAO-CATRACAS.md`).
 - Lançamento automático de contestações (chargeback / PIX MED) e taxas de saque a partir do extrato da Zet.
 - Importação diária do borderô da Zet (validações) e relatório diário de público, ticket médio e previsão; extrato conta-corrente Zet (`12-RELATORIO-DIARIO-E-ACERTO-ZET.md`).
 
