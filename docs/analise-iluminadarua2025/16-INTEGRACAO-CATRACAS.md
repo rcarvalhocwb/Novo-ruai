@@ -78,7 +78,7 @@ O `docs/16` e o `docs/18` deles preveem enviar à Zet um aviso de consumo a cada
 
 ### 3.3 Venda de balcão: onde ela é registrada
 
-> **Decisão para 2026 (26/09): opção C, como hoje.** Não há tempo antes do início das vendas (15/10). A venda no PC das catracas (opção A) fica para 2027. Em 2026, o sistema novo só precisa receber das catracas as **passagens consumidas por categoria**, para a conferência total bilheteria × catraca.
+> **Decisão para 2026 (26/09): opção C, como hoje.** Não há tempo antes do início das vendas (15/10). A venda no PC das catracas (opção A) fica para 2027. Em 2026, a conexão com a catraca (entrega 4 do roadmap) cobre: tentativas e passagens consumidas por categoria (conferência total bilheteria × catraca, público e ticket médio), saúde das catracas e cartões bloqueados.
 
 A Conexão Topdata já tem `VenderNoBalcao`:
 - uma linha em `ticket_sale` por venda, com cartão, categoria, usos, hora e operador;

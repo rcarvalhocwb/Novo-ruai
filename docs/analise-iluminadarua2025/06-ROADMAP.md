@@ -2,19 +2,25 @@
 
 Cada fase entrega algo utilizável e tem **critério de aceite objetivo**. Uma fase só avança com a anterior aceita.
 
-## Escopo de 2026 (decidido em 26/09/2026: vendas online começam em 15/10)
+## Escopo de 2026 (decidido em 26/09/2026)
 
-**Sem mudanças grandes neste ano.** A bilheteria continua vendendo **como hoje**: cartão entregue já carregado com o tipo, sem registro de venda por guichê. Ficam **para 2027**:
-- a tela de venda de balcão;
-- o modo "por guichê";
-- a API completa com o sistema das catracas;
-- o robô automático.
+Datas: **vendas online a partir de 15/10**; **vendas de bilheteria e máquinas a partir de novembro**.
 
-| Até | O que precisa estar pronto | Por quê |
-|---|---|---|
-| **15/10** (início das vendas online) | Recebimento do webhook da Zet que **guarda tudo antes de processar** (Worker + fila + R2, com token novo na URL). Export de Transações da Zet baixado **à mão, todo dia**, e guardado | É o que evita perder vendas de novo, como em 2025. Se o processamento atrasar, o dado bruto está guardado |
-| **Abertura do evento** | Fechamento por guichê: dinheiro e maquininha. Conferência de ingressos no **total dos 9 guichês × catraca** (R28, modo total). Tesouraria, sangrias, foods e relatório do dia com duas assinaturas | É o que resolve os centavos e a conciliação |
-| Durante o evento, se sobrar tempo | Robô do painel da Zet; botão "Sincronizar com a Zet"; importação automática das vendas da máquina da Zet | Enquanto isso, o export baixado à mão cobre essas funções |
+**Fica fora de 2026:** a tela de venda no guichê e o modo "por guichê". A bilheteria vende como hoje, e a conferência de ingressos é **total dos 9 guichês × catraca** (R28).
+
+**Entra em 2026:** webhook Zet, robô, botão de sincronização, conexão com a catraca, fechamentos diários, tesouraria, sangria, foods e relatórios.
+
+| Entrega | Até | Conteúdo mínimo | Referência |
+|---|---|---|---|
+| 1. Fundação | **06/10** | Projeto novo; livro-razão em centavos (`fin`), com testes; `money.ts`; papéis e permissões; só o schema `api` exposto | `03`, fase 1 |
+| 2. Webhook Zet | **13/10** (2 dias de folga antes de 15/10) | Worker + fila + R2 com token novo; inbox imutável; processamento de venda e estorno por voucher; conta "A receber Zet"; teste de carga e de banco fora do ar | `04` |
+| 3. Robô da Zet | **24/10** | Login com segredos do ambiente; export de Transações, Lista de ingressos e Extrato; importação das vendas sem webhook e das vendas da máquina; contestações; validações (R27); snapshot com hash; execução diária e botão **Sincronizar com a Zet** | `13`, `14`, `15` |
+| 4. Conexão com a catraca | **31/10** | API mínima: sobem as tentativas e passagens (e a saúde); descem os cartões bloqueados e a configuração. **Não** inclui a venda de balcão nem a baixa na Zet | `16`, seção 4 |
+| 5. Fechamento e tesouraria | **07/11** | Sessões de caixa dos 9 guichês; fundo de troco; sangrias na hora; contagem; tolerâncias; conferência **total** bilheteria × catraca; tesouraria zerada; duas assinaturas; dia travado | `10`, R28 |
+| 6. Foods e relatórios | **14/11** | Comissões com vigência; repasses; falta de repasse; relatório do dia em PDF (modelo aprovado pela equipe); conta-corrente Zet | `12`, `modelo-relatorio/` |
+| Ensaio geral | **antes da 1ª venda de bilheteria** | Um dia simulado com dados de 2025 anonimizados: fechamento = extrato, R$ 0,00 de diferença | fases 3 e 6 |
+
+As datas pressupõem começar já. A ordem segue o calendário: o online começa primeiro, a bilheteria depois. Se algo atrasar, a entrega 2 (webhook) **não** pode atrasar. Até o robô ficar pronto, o export da Zet é baixado à mão, todo dia.
 
 O restante das fases abaixo continua valendo como plano completo, a partir de 2027.
 
