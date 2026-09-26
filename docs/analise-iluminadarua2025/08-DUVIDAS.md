@@ -4,10 +4,10 @@ A análise marcou como **[DÚVIDA]** tudo o que o código não permite afirmar. 
 
 ## Para você (regra de negócio)
 
-1. **Taxa da Zet:** qual é a regra contratual? (a) 10% **do bruto** (a Zet retém do que o cliente pagou) ou (b) **markup** de 10% cobrado do cliente além do preço do ingresso? Os documentos `FINANCIAL-CALCULATIONS.md` e `COMPRENOZET-TAX-CALCULATION.md` dizem coisas diferentes. Isso define se a taxa é **despesa do evento** ou **valor de terceiro** que só passa pelo pedido.
+1. ~~**Taxa da Zet**~~ **Respondida:** acréscimo de 10% sobre o preço do ingresso, pago pelo cliente e retido pela Zet (R$ 30,00 + R$ 3,00 = R$ 33,00 no payload). A receita do evento é o líquido.
 2. **Desconto:** `totalValue` já vem com o desconto aplicado? O webhook antigo grava `total_amount = totalValue − discount`, mas `gross_amount = totalValue`.
-3. **Estorno Zet:** no estorno, a Zet devolve a taxa ao evento ou fica com ela? Existe estorno **parcial** (só alguns ingressos do pedido)?
-4. **Comissão de foods:** quem paga a quem? O `FoodRepaymentService` trata o repasse da loja como **receita** do evento, e o manual (passo 3.6) fala em "pagar comissões de lojas" como **despesa**. Existem os dois sentidos?
+3. **Estorno Zet:** no estorno, o evento devolve só o preço do ingresso (R$ 30,00) ou a Zet também desconta a taxa (R$ 3,00) do repasse do evento? Existe estorno **parcial** (só alguns ingressos do pedido)?
+4. ~~**Comissão de foods**~~ **Respondida:** a loja paga a comissão ao evento. O repasse é receita do evento.
 5. **Ajuste de comissão:** o wizard permite receber um valor menor que o esperado ("desconto acordado"). Isso é **desconto concedido** (despesa) ou **perda**? Quem pode autorizar?
 6. **Ingressos físicos:** o preço dos cartões inteira, meia e social é fixo por evento/dia? Há venda de produtos em todos os caixas?
 7. **Caixa mínimo:** R$ 1.000 é regra fixa ou configurável por evento?

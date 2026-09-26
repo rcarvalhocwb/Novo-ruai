@@ -23,7 +23,7 @@ POST /webhook   // header: x-webhook-signature = hex(HMAC-SHA256(WEBHOOK_SECRET,
 }
 ```
 
-**Para confirmar com a Zet** (ver `08-DUVIDAS.md`): se a assinatura existe e é enviada sempre; se há timestamp ou id de entrega; a política de reenvio (quantas vezes, intervalo, o que conta como sucesso); se a ordem de entrega é garantida; os IPs de origem; se existe **API de consulta** de pedidos ou relatório exportável; e a semântica de `discount` e de `totalTax` no estorno.
+**Para confirmar com a Zet** (ver `08-DUVIDAS.md`): se a assinatura existe e é enviada sempre; se há timestamp ou id de entrega; a política de reenvio (quantas vezes, intervalo, o que conta como sucesso); se a ordem de entrega é garantida; os IPs de origem; se existe **API de consulta** de pedidos ou relatório exportável; e a semântica de `discount` e se a Zet desconta a taxa do evento no estorno. (A regra da taxa já está confirmada: acréscimo de 10% sobre o preço do ingresso, retido pela Zet.)
 
 ## 2. Arquitetura
 
@@ -203,7 +203,7 @@ create table sales.zet_order_items (
   voucher         text primary key,
   order_uuid      uuid not null references sales.zet_orders(order_uuid) on delete restrict,
   ticket_type_id  uuid not null,
-  gross_cents     bigint not null,         -- rateio pelo maior resto sobre list_price_cents
+  net_cents       bigint not null,         -- preço do ingresso; rateio do líquido pelo maior resto sobre list_price_cents
   status          text not null check (status in ('valid','cancelled'))
 );
 ```
@@ -243,14 +243,16 @@ event_id := zet_event_map[event.id]  (senão: failed)
 if action = CP:
    if exists order: comparar valores -> igual: no-op | diferente: exceção
    else:
+     net := gross - fee                        -- preço do ingresso = receita do evento
+     validar fee ≈ applyRate(net, 1000) com tolerância de 1 centavo por ingresso (senão: exceção, sem bloquear)
      pesos := list_price_cents de cada voucher (via zet_ticket_type_map)
-     itens := allocate(gross, pesos)
+     itens := allocate(net, pesos)
      insert order + itens
-     post_entry('zet:CP:'||uuid, D A receber Zet net, D Taxa Zet fee, C Receita online gross)
+     post_entry('zet:CP:'||uuid, D A receber Zet net, C Receita online net)
 if action = ES:
    if not exists order: exceção 'estorno órfão' (retry)
    elif status = ESTORNADO: no-op
-   else: update status; cancelar itens; post_entry('zet:ES:'||uuid, espelho da venda [ver DÚVIDA sobre taxa])
+   else: update status; cancelar itens; post_entry('zet:ES:'||uuid, D Estornos online net, C A receber Zet net)
 update inbox set status='processed', processed_at=now()
 ```
 

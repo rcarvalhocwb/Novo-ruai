@@ -138,12 +138,11 @@ No SQL, a mesma regra: `(amount_cents * bps + 5000) / 10000` em `bigint`.
 | 1.2.10+ | A receber – comissão loja *N* | Ativo | D |
 | 2.1.01 | Crédito de loja (repasse a maior) | Passivo | C |
 | 3.1.01 | Repasses à administração | Patrimônio | D |
-| 4.1.01 | Receita ingressos online (bruto) | Receita | C |
+| 4.1.01 | Receita ingressos online (líquido = preço do ingresso) | Receita | C |
 | 4.1.02 | Receita ingressos bilheteria | Receita | C |
 | 4.1.03 | Receita produtos bilheteria | Receita | C |
 | 4.2.01 | Receita comissão foods | Receita | C |
 | 4.9.01 | Estornos de ingressos online | Redutora de receita | D |
-| 5.1.01 | Taxa Zet | Despesa | D |
 | 5.1.02 | Taxa PagBank (MDR) | Despesa | D |
 | 5.2.01 | Quebra de caixa | Despesa | D |
 | 5.9.xx | Despesas operacionais | Despesa | D |
@@ -152,8 +151,8 @@ No SQL, a mesma regra: `(amount_cents * bps + 5000) / 10000` em `bigint`.
 
 | Fato | Débito | Crédito |
 |------|--------|---------|
-| Venda Zet (CP), bruto 110,00, taxa 10,00 | A receber Zet 100,00 · Taxa Zet 10,00 | Receita online 110,00 |
-| Estorno Zet (ES) do mesmo pedido | Estornos online 110,00 | A receber Zet 100,00 · Taxa Zet 10,00 *(se a Zet devolve a taxa [DÚVIDA])* |
+| Venda Zet (CP): ingresso 30,00, taxa 3,00, cliente paga 33,00 | A receber Zet 30,00 | Receita online 30,00 |
+| Estorno Zet (ES) do mesmo pedido | Estornos online 30,00 | A receber Zet 30,00 |
 | Repasse Zet cai no banco (98.000,00) | Banco 98.000,00 | A receber Zet 98.000,00 |
 | Venda bilheteria em dinheiro | Caixa físico | Receita bilheteria |
 | Venda bilheteria em cartão, bruto 100,00, MDR real 3,08 | A receber PagBank 96,92 · Taxa PagBank 3,08 | Receita bilheteria 100,00 |
@@ -164,6 +163,8 @@ No SQL, a mesma regra: `(amount_cents * bps + 5000) / 10000` em `bigint`.
 | Comissão loja do dia (vendas 1.234,56 × 15%) | A receber loja N 185,18 | Receita comissão foods 185,18 |
 | Repasse da loja (FIFO) | Banco / Caixa | A receber loja N (excedente em Crédito de loja) |
 | Repasse à administração | Repasses à administração | Banco |
+
+A **taxa da Zet não entra no livro-razão**: é um acréscimo pago pelo cliente e retido pela própria Zet, então nunca passa pelo caixa do evento. Bruto e taxa ficam registrados na venda (`sales.zet_orders`) para conferência. Se a Zet descontar a taxa do evento em algum estorno, isso vira um lançamento próprio (D Despesa taxa Zet em estorno / C A receber Zet), identificado na conciliação.
 
 A pergunta "**quanto a Zet ainda me deve?**" passa a ser o **saldo da conta 1.2.01**. "Quanto a loja N deve?" é o saldo da 1.2.1N. "Quanto deveria haver no caixa 3?" é o saldo da 1.1.01-3. **A conciliação vira comparar saldo de conta com extrato.**
 

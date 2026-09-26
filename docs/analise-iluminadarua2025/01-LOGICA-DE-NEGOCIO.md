@@ -10,9 +10,9 @@ Tudo o que está aqui foi extraído do código e da documentação do `iluminada
 | **Sessão / show time** | Data e horário de visitação vendável. |
 | **Tipo de ingresso** | Inteira, Meia, Social/Gazeta, Cortesia. |
 | **Zet / CompreNoZet** | Plataforma de venda online. Envia webhooks `CP` (compra paga) e `ES` (estorno). |
-| **Bruto (`totalValue`)** | Valor pago pelo cliente na Zet. |
-| **Taxa (`totalTax`)** | Valor retido pela Zet. |
-| **Líquido** | `bruto − taxa`: o que a Zet repassa ao evento. |
+| **Bruto (`totalValue`)** | Valor pago pelo cliente na Zet = preço do ingresso + taxa Zet. |
+| **Taxa (`totalTax`)** | Taxa de conveniência: **acréscimo de 10% sobre o preço**, paga pelo cliente e **retida pela Zet**. Não é receita nem despesa do evento. |
+| **Líquido** | `bruto − taxa` = preço do ingresso: **a receita do evento** e o que a Zet repassa. |
 | **Repasse online** | Transferência da Zet para a conta do evento (`online_transfers`: esperado × recebido). |
 | **Bilheteria** | Venda física: dinheiro, cartão/PIX na maquininha PagBank e cartões físicos de ingresso por caixa. |
 | **Sessão de caixa (cashier session)** | Um caixa numerado (1–20) num dia: troco inicial, cartões de ingresso iniciais e restantes, dinheiro restante, total da maquininha, total de PIX. |
@@ -55,11 +55,18 @@ flowchart LR
 5. Cada voucher vira um ingresso validável na catraca.
 6. O repasse da Zet cai na conta bancária e é conciliado contra a soma dos líquidos do período (`online_transfers.expected_amount` × `received_amount`).
 
-**Regra da taxa [DÚVIDA]:** a documentação tem duas versões incompatíveis.
-- `docs/architecture/FINANCIAL-CALCULATIONS.md`: taxa = 10% **do bruto**, arredondada por pedido (observado de 9,09% a 12,20%).
-- `docs/integrations/COMPRENOZET-TAX-CALCULATION.md`: taxa = **markup** de 10% sobre o líquido (`bruto = líquido × 1,10`).
+**Regra da taxa (confirmada):** a taxa é um **acréscimo de 10% sobre o preço do ingresso** (o líquido), cobrado do cliente e retido pela Zet.
 
-Na reconstrução, isso deixa de importar para o livro-razão, porque ele usa o `totalTax` recebido. Mas importa para **validar** se a Zet cobrou certo.
+| | Valor |
+|---|---|
+| Preço do ingresso (líquido, receita do evento) | R$ 30,00 |
+| Taxa Zet (10% sobre o líquido) | R$ 3,00 |
+| `totalValue` no payload (bruto, pago pelo cliente) | R$ 33,00 |
+
+Consequências:
+- A **receita do evento é o líquido**. A taxa é da Zet e não entra como receita nem como despesa do evento.
+- Validação (sem reescrever nada): `taxa ≈ arredondar(líquido × 10%)`. Como a Zet pode arredondar por ingresso, aceita-se uma diferença de até 1 centavo por ingresso; acima disso, abre-se exceção para conferir com a Zet.
+- Visto sobre o bruto, a taxa dá 9,09% (`3/33`). O documento `FINANCIAL-CALCULATIONS.md` calculava "10% do bruto" e por isso achava que a Zet cobrava a mais. **Essa regra estava errada**; a de `COMPRENOZET-TAX-CALCULATION.md` estava certa.
 
 **Desconto [DÚVIDA]:** o webhook v1 grava `orders.total_amount = totalValue − discount`, mas `online_sales_transactions.gross_amount = totalValue`. Não está claro se `totalValue` já vem com o desconto aplicado.
 
@@ -78,14 +85,14 @@ Na reconstrução, isso deixa de importar para o livro-razão, porque ele usa o 
 5. A loja tem movimentos próprios (sangria, despesa, ajustes) e fechamento próprio (`store_daily_closures`: vendas do dia e acumuladas, saídas, dinheiro esperado × declarado, diferença).
 6. Os foods **não entram** no saldo financeiro da bilheteria nem no ticket médio. Aparecem só como informação no relatório.
 
-**[DÚVIDA]** O manual (passo 3.6) fala em "pagar comissões de lojas" como **despesa**, mas o `FoodRepaymentService` trata o repasse da loja como **receita** do evento. Quem paga a quem?
+**Confirmado:** a **loja paga a comissão ao evento**. O `FoodRepaymentService` está certo (repasse = receita do evento). O manual (passo 3.6), que fala em "pagar comissões de lojas" como despesa, está errado e deve ser corrigido no novo sistema: o passo passa a ser **"receber comissões das lojas"**.
 
 ### 2.4 Fechamento diário (wizard de 6 passos)
 1. **Importar**: repasses online recebidos na data e transações PagBank liquidadas na data.
 2. **Movimentações manuais**: receitas e despesas com forma de pagamento.
 3. **Troco**: inicial e final.
 4. **Catraca**: contagem inicial e final × ingressos vendidos (tolerância de 5 a 10; mais de 20 é alerta de fraude).
-5. **Comissões**: marcar recebidas e ajustar o valor (desconto acordado).
+5. **Comissões**: marcar as comissões **recebidas das lojas** e ajustar o valor (desconto acordado).
 6. **Revisão**: receitas − despesas = saldo; saldo físico deve ser igual ao saldo calculado. Depois vem a assinatura digital.
 7. **Aprovação**: quem fecha assina; o aprovador aprova, pede revisão ou rejeita (com motivo). Sai um PDF com as duas assinaturas e QR de verificação.
 8. Depois de fechado, **não pode ser editado**; só um admin reabre. Essa regra está no manual, mas **não é garantida pelo banco**.
@@ -106,12 +113,12 @@ Na reconstrução, isso deixa de importar para o livro-razão, porque ele usa o 
 
 | # | Regra |
 |---|-------|
-| R1 | Valores de venda online são os **exatos recebidos da Zet**. A taxa nunca é recalculada. |
+| R1 | Valores de venda online são os **exatos recebidos da Zet**. A taxa nunca é recalculada. A **receita do evento é o líquido** (`totalValue − totalTax`); a taxa é da Zet. |
 | R2 | Idempotência por `order.uuid`: um pedido corresponde a uma venda. |
 | R3 | Estorno Zet é do **pedido inteiro** e cancela todos os vouchers. |
 | R4 | Cortesia = venda com valor zero, contada como ingresso e fora da receita. |
 | R5 | Comissão de food = `vendas × %` da loja, **arredondada a centavos uma única vez** (hoje isso é inconsistente). |
-| R6 | Repasse de food é distribuído **FIFO** entre os dias pendentes. |
+| R6 | A **loja paga a comissão ao evento**. O repasse de food é distribuído **FIFO** entre os dias pendentes. |
 | R7 | Foods ficam fora do saldo da bilheteria e do ticket médio. |
 | R8 | Produtos ficam dentro da bilheteria e fora do ticket médio. |
 | R9 | Fechamento diário exige conferência física, assinatura de quem fecha e aprovação. |

@@ -69,6 +69,7 @@ create index on recovery.rows(source, natural_key);
 4. Só em F7 ou no dump (a Zet não lista): **suspeita de venda forjada** (o webhook era aberto). Confirmar com a Zet. Sem confirmação, **não entra** na receita e vira exceção.
 5. Status divergente (ex.: F2 = PAGO, banco = ESTORNADO): vale o **F2**. Registrar como exceção "possível estorno forjado".
 6. Conferir que Σ líquidos por lote de repasse (F3) é igual ao crédito correspondente em F1.
+7. Para cada pedido, conferir `taxa ≈ líquido × 10%` (tolerância de 1 centavo por ingresso). Registros que as funções antigas `recalculate-zet-taxes` e `fix-comprenozet-tax-calculation` alteraram devem ser restaurados **pelo valor do relatório Zet (F2)**, nunca pela fórmula.
 
 ### 2.3 Bilheteria (dinheiro e cartão)
 1. Cartão/PIX: **base = F4** (PagBank). Uma transação vira um lançamento com o MDR real. Conferir a liquidação contra F1.
