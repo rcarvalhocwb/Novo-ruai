@@ -1,0 +1,10 @@
+{
+  "name": "novo-ruai",
+  "private": true,
+  "packageManager": "pnpm@10.0.0",
+  "scripts": {
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "db:test": "tools/db-test.sh"
+  }
+}

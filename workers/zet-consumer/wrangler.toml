@@ -1,0 +1,32 @@
+# Consumidor da fila → integ.receive_webhook, com o papel ingest_writer via Hyperdrive.
+# O Hyperdrive guarda a string de conexão (usuário ingest_writer); o id abaixo não é segredo.
+# Criar: wrangler hyperdrive create ruai-ingest-<env> --connection-string "postgres://ingest_writer:<senha>@<pooler>:5432/postgres"
+name = "zet-consumer"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = false
+
+[env.hml]
+name = "zet-consumer-hml"
+r2_buckets = [{ binding = "RAW", bucket_name = "ruai-raw-hml" }]
+hyperdrive = [{ binding = "HYPERDRIVE", id = "PREENCHER_ID_HYPERDRIVE_HML" }]
+[[env.hml.queues.consumers]]
+queue = "zet-webhooks-hml"
+max_batch_size = 10
+max_batch_timeout = 5
+max_concurrency = 2
+max_retries = 100
+dead_letter_queue = "zet-webhooks-dlq-hml"
+
+[env.production]
+name = "zet-consumer"
+r2_buckets = [{ binding = "RAW", bucket_name = "ruai-raw" }]
+hyperdrive = [{ binding = "HYPERDRIVE", id = "PREENCHER_ID_HYPERDRIVE_PROD" }]
+[[env.production.queues.consumers]]
+queue = "zet-webhooks"
+max_batch_size = 10
+max_batch_timeout = 5
+max_concurrency = 2
+max_retries = 100
+dead_letter_queue = "zet-webhooks-dlq"
