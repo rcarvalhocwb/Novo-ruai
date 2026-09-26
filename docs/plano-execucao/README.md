@@ -14,6 +14,7 @@ Feito a partir de `docs/analise-iluminadarua2025/` (fonte da verdade, regras R1 
 | 8 | [`08-plano-de-virada.md`](08-plano-de-virada.md) | Congelamento do sistema antigo, troca do link na Zet, carga do cadastro, destino dos dados de 2025 |
 | 9 | [`09-riscos.md`](09-riscos.md) | 20 riscos com probabilidade, impacto, mitigação e gatilho |
 | 10 | [`10-perguntas-em-aberto.md`](10-perguntas-em-aberto.md) | Perguntas por destinatário (dono, Zet, PagBank, catracas), com prazo |
+| 11 | [`11-estado-atual-da-infra.md`](11-estado-atual-da-infra.md) | Levantamento só leitura do Supabase e da Cloudflare atuais; o banco antigo não é alterado |
 
 ## Em uma página
 
