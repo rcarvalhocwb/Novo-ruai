@@ -36,6 +36,7 @@ Cada fase entrega algo utilizável e tem **critério de aceite objetivo**. Uma f
 - Importação automática das maquininhas pela API do Extrato EDI do PagBank (D+1, por número de série → guichê), com a taxa real; CSV só como plano B; importador OFX do banco.
 - Conciliação da catraca por ingresso, por tipo e por valor (`10-ASSISTENTE-FECHAMENTO.md`, seção 8).
 - Tela de configurações do evento (tolerâncias, caixa mínimo, assinantes, contas bancárias).
+- Botão **Sincronizar com a Zet** no wizard (fila no servidor, uma execução por vez, intervalo mínimo) e bloco "Zet no dia" no relatório (`13-ROBO-PAINEL-ZET.md`, seção 5a).
 - Wizard de fechamento: esperado (livro-razão) × declarado; quebra e sobra como lançamento; assinatura; aprovação; trava do dia; hash no PDF.
 - Rascunho em tabela separada.
 

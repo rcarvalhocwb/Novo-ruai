@@ -65,6 +65,9 @@ Sangria que não foi registrada aparece como falta no fechamento. É exatamente 
 ### Catraca (no fechamento do dia, não por guichê)
 - Entradas da catraca no dia × ingressos válidos para o dia (online com visita no dia + bilheteria). Alerta acima de 5%, crítico acima de 10% (regra atual mantida).
 
+### Fechamento do dia: dados da Zet
+Antes das assinaturas, o wizard oferece o botão **Sincronizar com a Zet**. Ele roda o robô e acrescenta ao relatório o bloco "Zet no dia": vendas online, vendas na máquina da Zet, estornos, contestações, entradas online e divergências. O online fica marcado como parcial até a meia-noite, e o fechamento **não trava** se a Zet estiver fora do ar. Ver `13-ROBO-PAINEL-ZET.md`, seção 5a.
+
 ## 4. Regra de tolerância (aprovada)
 
 A tolerância não serve para "esconder" diferença; ela só define **o quanto de justificativa e aprovação** cada diferença exige. Os valores abaixo foram aprovados como padrão e ficam **editáveis numa tela de configurações do evento** (tabela `fin.event_settings`, alterações registradas na auditoria):

@@ -79,6 +79,50 @@ Em qualquer das duas, **provar que leu tudo**:
 - Fluxo: login → navega até cada relatório → exporta ou lê → salva os arquivos com hash → envia para uma função de importação autenticada (com papel próprio de "importador").
 - Monitoramento: alerta se o robô não rodar, se o login falhar, se o formato mudar ou se a conciliação encontrar mais de N divergências.
 
+## 5a. Botão "Sincronizar com a Zet" no fechamento do dia
+
+Além da execução automática da madrugada, o wizard de fechamento tem um botão para rodar o robô na hora e montar o relatório de fechamento com os dados da Zet do dia.
+
+**Como funciona**
+1. O gestor ou aprovador clica em **Sincronizar com a Zet**. O navegador **não** roda o robô: o clique só coloca um pedido na fila (`integ.robot_runs`, com quem pediu e quando), e o robô roda no servidor.
+2. A tela mostra o andamento: login, Transações, Lista de ingressos, Extrato, Detalhes dos pedidos novos, conciliação.
+3. Proteções:
+   - **uma execução por vez**: se já houver uma rodando, o botão mostra o andamento dela, sem abrir outra;
+   - **intervalo mínimo** entre execuções manuais (ex.: 10 minutos, configurável), para não sobrecarregar o site da Zet;
+   - a execução é **idempotente**: rodar de novo não duplica venda nem voucher.
+4. No fim, o relatório de fechamento ganha o bloco **"Zet no dia"**, com a hora da sincronização:
+
+| Linha | Fonte |
+|---|---|
+| Vendas online do dia (pedidos, ingressos, líquido) | Webhook + export, conciliados |
+| Vendas na **máquina da Zet** do dia, por meio de pagamento | Export (importadas pelo robô) |
+| Estornos e **contestações** do dia | Webhook ES + Extrato |
+| Vendas de dias anteriores **descobertas agora** (webhook perdido) | Export |
+| Entradas online (validados no dia), compradas hoje × antes | Lista de ingressos |
+| Divergências abertas (pedido só de um lado, líquido diferente, sem data, itens pendentes) | `recon.v_zet_export_diff` |
+| Saldo com a Zet (a receber, ou negativo) | Extrato |
+
+**Dois cuidados**
+- **O online só fecha à meia-noite.** A bilheteria fecha antes, então o bloco "Zet no dia" do fechamento dos caixas é **parcial até a hora da sincronização**, e o relatório diz isso. A execução da madrugada completa o dia. O que ela encontrar depois do fechamento entra no relatório do dia seguinte como "ajustes do dia anterior", **sem reabrir** o dia assinado.
+- **O fechamento não depende do robô.** Se a Zet estiver fora do ar ou o login falhar, os caixas fecham normalmente. O relatório mostra "sem dados da Zet desde HH:MM" e a pendência fica para a execução da madrugada. Foi uma dependência externa que derrubou o sistema antigo; o fechamento não pode travar por causa dela.
+
+```sql
+create table integ.robot_runs (
+  id            bigserial primary key,
+  trigger       text not null check (trigger in ('agendado','fechamento','manual')),
+  requested_by  uuid references auth.users(id),
+  requested_at  timestamptz not null default now(),
+  started_at    timestamptz,
+  finished_at   timestamptz,
+  status        text not null default 'na_fila' check (status in ('na_fila','rodando','ok','falhou')),
+  step          text,                               -- etapa atual, para a barra de andamento
+  error         text,
+  summary       jsonb                               -- contagens e totais da execução
+);
+-- no máximo uma execução na fila ou rodando
+create unique index robot_runs_one_active on integ.robot_runs ((true)) where status in ('na_fila','rodando');
+```
+
 ## 6. Próximos passos
 
 1. Cadastrar as credenciais de teste como **segredos do ambiente** (`ZET_PANEL_URL`, `ZET_PANEL_USER`, `ZET_PANEL_PASSWORD`). Nunca enviar senha por mensagem.

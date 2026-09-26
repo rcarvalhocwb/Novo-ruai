@@ -35,6 +35,7 @@
 - [ ] Online (pelo borderô): entradas do dia, divididas em compradas hoje × antes; ingressos com visita hoje não utilizados listados.
 
 **Encerramento**
+- [ ] Sincronização com a Zet feita (botão no wizard) e bloco "Zet no dia" revisado; online marcado como parcial até a meia-noite. Se a Zet estiver fora, registrar e seguir.
 - [ ] Revisão do resumo (receitas, despesas, saldo por conta).
 - [ ] Os 9 caixas fechados.
 - [ ] Assinatura das **duas pessoas designadas** (vigentes no momento da assinatura) sobre o mesmo conteúdo.
