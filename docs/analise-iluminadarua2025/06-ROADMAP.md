@@ -2,6 +2,22 @@
 
 Cada fase entrega algo utilizável e tem **critério de aceite objetivo**. Uma fase só avança com a anterior aceita.
 
+## Escopo de 2026 (decidido em 26/09/2026: vendas online começam em 15/10)
+
+**Sem mudanças grandes neste ano.** A bilheteria continua vendendo **como hoje**: cartão entregue já carregado com o tipo, sem registro de venda por guichê. Ficam **para 2027**:
+- a tela de venda de balcão;
+- o modo "por guichê";
+- a API completa com o sistema das catracas;
+- o robô automático.
+
+| Até | O que precisa estar pronto | Por quê |
+|---|---|---|
+| **15/10** (início das vendas online) | Recebimento do webhook da Zet que **guarda tudo antes de processar** (Worker + fila + R2, com token novo na URL). Export de Transações da Zet baixado **à mão, todo dia**, e guardado | É o que evita perder vendas de novo, como em 2025. Se o processamento atrasar, o dado bruto está guardado |
+| **Abertura do evento** | Fechamento por guichê: dinheiro e maquininha. Conferência de ingressos no **total dos 9 guichês × catraca** (R28, modo total). Tesouraria, sangrias, foods e relatório do dia com duas assinaturas | É o que resolve os centavos e a conciliação |
+| Durante o evento, se sobrar tempo | Robô do painel da Zet; botão "Sincronizar com a Zet"; importação automática das vendas da máquina da Zet | Enquanto isso, o export baixado à mão cobre essas funções |
+
+O restante das fases abaixo continua valendo como plano completo, a partir de 2027.
+
 ## Fase 0: Contenção e evidências (1 a 3 dias)
 - Ações urgentes no sistema antigo (`00-RESUMO-EXECUTIVO.md`).
 - Dump completo, cópia do R2, export dos logs e pedido de backups ao suporte do Supabase.
