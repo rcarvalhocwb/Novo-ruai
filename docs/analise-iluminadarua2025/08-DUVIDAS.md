@@ -27,13 +27,16 @@ A análise marcou como **[DÚVIDA]** tudo o que o código não permite afirmar. 
 13. Quais são os **IPs de origem** dos webhooks? O histórico não ajuda: o sistema antigo gravou só o IP do Cloudflare. O `user-agent` da Zet é `axios/0.27.2`.
 14. Qual é a política de **reenvio** (quantas tentativas, intervalo, o que conta como sucesso)? O backup mostra reenvios (1.256 pedidos com 2 ou mais entregas), mas 72 webhooks que deram erro de conexão nunca chegaram de novo com sucesso.
 15. Existe **API de consulta** de pedidos (por período e por uuid) ou só export do painel?
+15a. **(Do mapeamento do painel, `14-MAPEAMENTO-PAINEL-ZET.md`, seção 7):** usuário só de leitura; diferença de 20 ingressos entre os dashboards; data de liberação 30/06/2026 nas contestações PIX; prazos de contestação; webhook para contestação; filtro de data e formato dos exports; uso futuro das máquinas da Zet.
+15b. **Para o dono do evento:** quem operava as **máquinas da Zet** (`PIX_MAQUINA`/`CREDITO_MAQUINA`, 2.397 ingressos) e onde? Eram vendas da bilheteria?
+
 16. Existe relatório de **composição de cada repasse** (quais pedidos entraram)?
 
 17a. O **borderô** pode ser exportado **por voucher** (código + data e hora da validação), e não só total por tipo? Existe API de validações?
 17b. Qual é a **política de cancelamento/estorno** da Zet (até quando o cliente pode pedir), e por quanto tempo a Zet retém valores por causa de chargeback? Quem arca com chargeback?
 17c. Qual é a **agenda de repasses** (D+quanto, por lote de vendas) e existe relatório da composição de cada repasse?
 
-17d. **Robô no painel:** ~~autorização~~ confirmada, com login de teste. Vendas não têm exportação (listagem). *Abertos:* captcha/2FA no login; usuário só de leitura em produção; se outros relatórios exportam. (Ver `13-ROBO-PAINEL-ZET.md`.)
+17d. **Robô no painel:** ~~autorização~~ confirmada. ~~Exportação~~ **Existe** nas telas do evento (Transações, Lista de ingressos, Extrato); só a tela geral de Vendas não exporta. Login sem captcha visível. *Abertos:* captcha/2FA no login; usuário só de leitura em produção; se outros relatórios exportam. (Ver `13-ROBO-PAINEL-ZET.md`.)
 
 ## Sobre o incidente
 

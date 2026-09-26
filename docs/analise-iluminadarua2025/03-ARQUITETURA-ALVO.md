@@ -145,6 +145,9 @@ No SQL, a mesma regra: `(amount_cents * bps + 5000) / 10000` em `bigint`.
 | 4.2.01 | Receita comissão foods | Receita | C |
 | 4.9.01 | Estornos de ingressos online | Redutora de receita | D |
 | 4.9.02 | Estornos da bilheteria | Redutora de receita | D |
+| 4.9.03 | Contestações online (chargeback / PIX MED), pelo extrato da Zet | Redutora de receita | D |
+| 4.1.04 | Receita de ingressos vendidos na máquina da Zet (líquida) | Receita | C |
+| 5.1.03 | Taxa de saque Zet | Despesa | D |
 | 5.1.02 | Taxa PagBank (MDR) | Despesa | D |
 | 5.2.01 | Quebra de caixa | Despesa | D |
 | 5.2.02 | Baixa de comissão não recebida (só admin, com motivo) | Despesa | D |

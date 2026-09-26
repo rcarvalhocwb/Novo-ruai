@@ -89,6 +89,7 @@ Os fatores do código que transformaram uma queda de infraestrutura em perda de 
 | `08-DUVIDAS.md` | Perguntas que só você pode responder |
 | `10-ASSISTENTE-FECHAMENTO.md` | Assistente de fechamento da bilheteria: problemas do atual e desenho por guichê, com tolerâncias |
 | `13-ROBO-PAINEL-ZET.md` | Robô diário no painel da Zet para conciliar vendas, estornos, borderô e repasses com os webhooks |
+| `14-MAPEAMENTO-PAINEL-ZET.md` | Telas e exports do painel da Zet; **R$ 975,00 em contestações sem webhook** (saldo negativo do evento na Zet); vendas na máquina da Zet |
 | `12-RELATORIO-DIARIO-E-ACERTO-ZET.md` | Relatório diário (financeiro, público, ticket médio, previsão) e acerto final com a Zet; prazos de estorno |
 | `11-VENDA-X-ENTRADA.md` | Por que o fechamento segue o dinheiro e não a catraca: três visões (caixa, acesso, competência) |
 | `09-ANALISE-WEBHOOKS-ZET.md` | Análise dos 27.641 webhooks do backup: totais, 199 vendas nunca gravadas, segurança |

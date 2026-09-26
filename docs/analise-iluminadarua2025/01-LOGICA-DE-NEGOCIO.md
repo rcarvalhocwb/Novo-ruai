@@ -166,6 +166,8 @@ O manual antigo (passo 3.6) fala em "pagar comissões de lojas" como despesa e e
 | R22 | Ingresso online vendido e não estornado é receita do evento, tenha sido utilizado ou não. O acerto com a Zet é: vendas − estornos − repasses recebidos. |
 | R23 | **Ticket médio** = valor pago pelos ingressos de quem **entrou** no dia ÷ pessoas que entraram (geral, bilheteria e online; com e sem cortesia). A venda média do dia é um indicador comercial separado. |
 | R24 | Um **robô** acessa diariamente o painel administrativo da Zet e traz vendas, estornos, borderô e relatórios para conciliar com os webhooks. Ver `13-ROBO-PAINEL-ZET.md`. |
+| R25 | **Contestações** (chargeback no cartão e devolução PIX/MED) só aparecem no **extrato da Zet**, não no webhook. Debitam o valor **líquido** da venda, na data em que aparecem, e podem deixar o saldo com a Zet negativo (caso real: −R$ 975,00 em 13 vendas). Ver `14-MAPEAMENTO-PAINEL-ZET.md`. |
+| R26 | A Zet também vende em **máquinas próprias** (`PIX_MAQUINA`, `CREDITO_MAQUINA`; `FISICO` no extrato), com a mesma taxa de 10%, **sem webhook**. Essas vendas entram pelo extrato e pela exportação de Transações. |
 | R13 | Divergência de catraca: alerta acima de 5%, crítico acima de 10%; mais de 20 entradas de diferença é suspeita de fraude. |
 
 ## 4. Modelo de dados atual (resumo)
