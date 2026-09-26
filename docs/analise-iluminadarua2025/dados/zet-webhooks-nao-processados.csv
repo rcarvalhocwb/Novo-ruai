@@ -1,0 +1,209 @@
+acao,order_uuid,zet_order_id,data_pagamento_brt,bruto,taxa,liquido,ingressos,ultimo_erro
+ES,8f2f7e3e-9f97-4778-86ae-0337debcb2e9,132403,2025-11-08 22:04,102.30,9.30,93.00,4,
+ES,ead08326-e2a8-4bfc-afdf-c4551df9fb5e,133190,2025-11-11 10:25,0.00,0.00,0.00,150,"VALIDATION_ERROR: Invalid payload: data.order.email: Expected string, received n"
+ES,9ba17405-ad9b-4f0b-a5e9-13891eee36e6,136191,2025-11-15 14:04,0.00,0.00,0.00,10,"VALIDATION_ERROR: Invalid payload: data.order.email: Expected string, received n"
+CP,c1009943-d420-456c-b9e6-db6791e632e8,136752,2025-11-15 18:48,158.40,14.40,144.00,4,VALIDATION_ERROR: Invalid payload: data.order.email: Invalid email
+CP,4cf5c457-2363-4523-9489-b6f7ac8291fd,140006,2025-11-18 13:38,82.50,7.50,75.00,3,
+CP,ec1ed594-bf77-458b-95a2-3cfd4ac211bc,142036,2025-11-19 22:09,106.70,9.70,97.00,5,VALIDATION_ERROR: Invalid payload: data.order.email: Invalid email
+CP,1cfe2450-5002-4464-9649-0184cf0ae20f,146038,2025-11-21 21:18,102.30,9.30,93.00,4,VALIDATION_ERROR: Invalid payload: data.order.cpf: String must contain at most 1
+CP,b6d0957f-b4cb-452e-aba4-ca29d60673d7,148842,2025-11-24 14:47,1069.20,97.20,972.00,43,VALIDATION_ERROR: Invalid payload: data.order.cpf: String must contain at most 1
+CP,e93b3194-dfef-4871-abad-2338bdf5b589,151868,2025-11-27 12:54,39.60,3.60,36.00,2,VALIDATION_ERROR: Invalid payload: data.order.cpf: String must contain at most 1
+CP,2571edde-d0c8-476e-85ba-02fc1925fc09,156576,2025-11-30 17:17,118.80,10.80,108.00,4,VALIDATION_ERROR: Invalid payload: data.order.cpf: String must contain at most 1
+CP,8c5439ee-d607-43c4-ba5d-e2711997e002,156736,2025-11-30 19:24,158.40,14.40,144.00,4,VALIDATION_ERROR: Invalid payload: data.order.cpf: String must contain at most 1
+CP,55ec8467-65fe-4eea-825a-28f6bb0bf0f4,156813,2025-11-30 20:24,39.60,3.60,36.00,2,VALIDATION_ERROR: Invalid payload: data.order.cpf: String must contain at most 1
+CP,0e19528b-f5a8-4e49-9731-9711a58eda06,157088,2025-12-01 11:10,39.60,3.60,36.00,2,VALIDATION_ERROR: Invalid payload: data.order.cpf: String must contain at most 1
+CP,4fbd5efd-910a-41bd-93c4-e2a5c6ee5b45,157242,2025-12-01 14:48,99.00,9.00,90.00,5,VALIDATION_ERROR: Invalid payload: data.order.cpf: String must contain at most 1
+CP,aa064ff4-dc28-42f4-b0bc-5deffacabeb1,158218,2025-12-02 14:27,99.00,9.00,90.00,3,VALIDATION_ERROR: Invalid payload: data.order.cpf: String must contain at most 1
+CP,99f3e98d-6646-4f5c-8deb-f8190af064aa,157042,2025-12-02 16:04,79.20,7.20,72.00,2,VALIDATION_ERROR: Invalid payload: data.order.cpf: String must contain at most 1
+CP,19e8681a-f2cd-49b6-b9bf-9f1075fa995b,158543,2025-12-02 18:30,455.40,41.40,414.00,17,VALIDATION_ERROR: Invalid payload: data.order.cpf: String must contain at most 1
+CP,46260ab9-a10d-436c-aa23-9330249e9a14,159088,2025-12-03 08:44,99.00,9.00,90.00,3,VALIDATION_ERROR: Invalid payload: data.order.cpf: String must contain at most 1
+CP,4983a192-f2c0-4a53-9b2f-7263ab1ca7ae,163708,2025-12-05 17:57,99.00,9.00,90.00,4,VALIDATION_ERROR: Invalid payload: data.order.cpf: String must contain at most 1
+CP,c8401e7c-89f5-4b65-aefc-9cba2467ce49,163729,2025-12-05 18:12,79.20,7.20,72.00,2,VALIDATION_ERROR: Invalid payload: data.order.cpf: String must contain at most 1
+CP,77957536-7f77-4909-8b98-0669c1b6e4c0,166857,2025-12-07 14:43,118.80,10.80,108.00,4,VALIDATION_ERROR: Invalid payload: data.order.cpf: String must contain at most 1
+CP,7a277266-bcbe-4c2a-ae69-e94f3df75279,168722,2025-12-08 16:22,316.80,28.80,288.00,8,VALIDATION_ERROR: Invalid payload: data.order.cpf: String must contain at most 1
+ES,f838f3ee-04f4-4747-8be8-0879870dd7fa,168539,2025-12-08 14:07,59.40,5.40,54.00,2,Order not found for refund: f838f3ee-04f4-4747-8be8-0879870dd7fa
+ES,66202faa-4d45-4e23-baa1-384b10342ca6,168472,2025-12-08 13:46,99.00,9.00,90.00,3,Order not found for refund: 66202faa-4d45-4e23-baa1-384b10342ca6
+CP,8fff34af-6111-4e4a-8fd5-c6696d172dfb,169419,2025-12-09 15:38,2831.40,257.40,2574.00,124,VALIDATION_ERROR: Invalid payload: data.order.cpf: String must contain at most 1
+CP,b806b391-a157-41aa-85c7-5741b32f8b38,171325,2025-12-11 12:18,805.20,73.20,732.00,28,VALIDATION_ERROR: Invalid payload: data.order.cpf: String must contain at most 1
+CP,671b897c-3d8b-4527-99cd-fdccb0c044be,171986,2025-12-11 18:49,79.20,7.20,72.00,2,VALIDATION_ERROR: Invalid payload: data.order.cpf: String must contain at most 1
+CP,a4005ae3-6776-489b-9689-4a7f62c361c7,172527,2025-12-12 09:55,319.00,29.00,290.00,13,VALIDATION_ERROR: Invalid payload: data.order.cpf: String must contain at most 1
+ES,0d27034f-e1d0-4e03-a2be-c6f71d594cfb,168501,,158.40,14.40,144.00,5,Order not found for refund: 0d27034f-e1d0-4e03-a2be-c6f71d594cfb
+CP,31264d64-be19-430f-906e-3756544693a2,174186,2025-12-13 19:20,19.80,1.80,18.00,1,
+CP,251e09c2-9b8a-4ebf-add9-2307c95154e3,174188,2025-12-13 19:20,158.40,14.40,144.00,4,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,19eb3b6c-2d18-4c71-a056-20cf24d44aca,174197,2025-12-13 19:22,79.20,7.20,72.00,3,
+CP,43da9b4b-01b6-4c5b-8be3-5b834447a637,174200,2025-12-13 19:24,118.80,10.80,108.00,4,
+CP,4f9c9b9a-9654-44b5-849d-9ce40979ae13,174211,2025-12-13 19:26,138.60,12.60,126.00,5,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,3040770a-ef1e-49fb-9535-5c62ea25f939,174208,2025-12-13 19:26,59.40,5.40,54.00,3,
+CP,59d735b0-4777-49af-b72f-edc8046be314,174210,2025-12-13 19:26,217.80,19.80,198.00,9,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,e23131bd-6a15-473b-9b98-5211f94fe6b5,174213,2025-12-13 19:27,39.60,3.60,36.00,2,
+CP,8cc0c9e2-21f2-4722-ab21-155ffcc87e1d,174218,2025-12-13 19:28,79.20,7.20,72.00,3,
+CP,21c48752-3a2d-4c66-b704-0144f79129f2,174217,2025-12-13 19:28,118.80,10.80,108.00,5,FINANCIAL_WRITE_FAILED: upstream connect error or disconnect/reset before header
+CP,7529bc4a-8610-4c8b-b1b0-7c3c9aab6c4b,174216,2025-12-13 19:29,59.40,5.40,54.00,2,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,4e45cecb-9874-4959-9526-09dfc654e4ae,174233,2025-12-13 19:30,118.80,10.80,108.00,4,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,0cadb807-fe0d-4ccd-b46b-1cebbfacdb58,174490,2025-12-13 20:57,138.60,12.60,126.00,4,
+CP,cde7bae3-a438-4fb8-9e28-dec160bcb033,174496,2025-12-13 20:57,59.40,5.40,54.00,2,
+CP,4f1d73fb-cc10-4a97-9f87-b27af18b10d4,174497,2025-12-13 20:59,79.20,7.20,72.00,2,FINANCIAL_WRITE_FAILED: upstream connect error or disconnect/reset before header
+CP,74d000c9-d911-4205-8e15-14b1e676ff67,174493,2025-12-13 20:59,257.40,23.40,234.00,7,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,93e5d740-d94a-4ca9-ab1f-9b6fbc275edd,174487,2025-12-13 21:00,158.40,14.40,144.00,4,upstream connect error or disconnect/reset before headers. reset reason: connect
+CP,8eaf3a87-447f-4ab7-a224-3a5399f3636a,174513,2025-12-13 21:10,79.20,7.20,72.00,2,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,cde6920d-1e77-401b-be59-29d2fa4aec6c,175218,2025-12-14 16:09,118.80,10.80,108.00,5,
+CP,5e4a71a3-72a3-4d10-bbfc-531560cb38c9,175258,2025-12-14 16:35,19.80,1.80,18.00,1,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,e49a8b8a-286f-4915-9cea-850d9119d2ef,175267,2025-12-14 16:42,79.20,7.20,72.00,4,
+CP,5295cdd9-6fa8-4c77-beb6-6b7b7015e672,175367,2025-12-14 18:22,178.20,16.20,162.00,5,VALIDATION_ERROR: Invalid payload: data.order.cpf: String must contain at most 1
+CP,af1343d1-d538-4f0b-82a7-c51a15be4845,178207,2025-12-16 17:30,2772.00,252.00,2520.00,123,VALIDATION_ERROR: Invalid payload: data.order.cpf: String must contain at most 1
+CP,0cbcb354-ebd7-436c-b209-bedf37674484,178366,2025-12-16 18:55,118.80,10.80,108.00,3,
+CP,b63192e6-326a-4b13-97de-68bd2c7c0156,178370,2025-12-16 18:56,158.40,14.40,144.00,6,
+CP,8d1f149b-47bd-48e8-9594-6a302e810deb,178346,2025-12-16 18:56,138.60,12.60,126.00,7,
+CP,da1b486d-83d1-48c0-996f-97befd6f38d4,178375,2025-12-16 18:56,79.20,7.20,72.00,2,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,673077c5-6af3-4fba-a316-43cac8148a85,179167,2025-12-17 12:47,39.60,3.60,36.00,2,
+CP,f775dd49-d90a-443e-8d2d-de2bada43b27,180077,2025-12-17 20:30,316.80,28.80,288.00,12,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,c8f359ca-de12-456c-a0a2-367b5aa8109f,180528,2025-12-18 10:36,138.60,12.60,126.00,7,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,0c8c68bc-a7ec-4d60-8f5a-a88e1bb33c3a,180779,2025-12-18 12:52,19.80,1.80,18.00,1,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,1aa61254-7e3e-4d71-af1d-089d25a3793b,181005,2025-12-18 15:07,19.80,1.80,18.00,1,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,f85ec568-379a-470a-ba8c-4064f05feafa,181086,2025-12-18 15:45,99.00,9.00,90.00,4,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,6bb21713-aeb5-463a-acfd-e3f343603b9c,181444,2025-12-18 18:25,79.20,7.20,72.00,2,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,d7ca8c55-382c-4846-a3ac-c0e48ed3fb5d,181470,2025-12-18 18:33,99.00,9.00,90.00,3,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,14cc2b4a-c846-4964-9e00-81530262c851,181478,2025-12-18 18:35,59.40,5.40,54.00,3,
+CP,e6159d55-534d-4b8f-8c10-ae452f5f1665,181489,2025-12-18 18:37,118.80,10.80,108.00,4,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,60c81ad9-c60e-43a3-ba11-7315b5cb0da9,181492,2025-12-18 18:37,99.00,9.00,90.00,3,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,3c8f6904-f42d-47c3-b1d0-251d5e2aee0b,181477,2025-12-18 18:38,118.80,10.80,108.00,4,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,de8069ac-a4aa-41bd-9c02-36acb9b595ed,181497,2025-12-18 18:39,19.80,1.80,18.00,1,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,9290c93a-50b8-4f96-96d9-9e43c28faaa5,181498,2025-12-18 18:40,19.80,1.80,18.00,1,No active events found. Create an event first. Webhook event: Rua Iluminada Famí
+CP,8e93ff45-9af0-47f9-b603-9cce5236de14,181495,2025-12-18 18:40,118.80,10.80,108.00,3,
+CP,61386179-1dc1-4294-9c93-1d380947d9db,181500,2025-12-18 18:40,59.40,5.40,54.00,3,FINANCIAL_WRITE_FAILED: upstream connect error or disconnect/reset before header
+CP,32212193-53f7-4b91-b23e-35636718d982,181502,2025-12-18 18:42,79.20,7.20,72.00,4,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,ddc695cc-eebb-4867-b741-8618c09c476c,181503,2025-12-18 18:42,118.80,10.80,108.00,5,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,ae39b443-a0d4-4f62-a8fb-56b5fa24ecc2,181504,2025-12-18 18:44,59.40,5.40,54.00,2,
+CP,fd0374f7-8959-4a7b-8e45-b5d3637d7b1d,181511,2025-12-18 18:45,39.60,3.60,36.00,2,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,2d772083-62b5-41de-ac1e-a6249423f5da,181510,2025-12-18 18:46,19.80,1.80,18.00,1,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,84fae5b9-2a5c-40e7-ae21-48ba0ccd5e40,181519,2025-12-18 18:46,79.20,7.20,72.00,2,No active events found. Create an event first. Webhook event: Rua Iluminada Famí
+CP,e3687980-4d3c-42e5-8dd9-b6305736be31,181518,2025-12-18 18:46,59.40,5.40,54.00,2,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,28754c44-a29c-4a36-8e13-9ac93483cc55,181517,2025-12-18 18:47,94.60,8.60,86.00,4,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,fef5449a-ab37-4727-aed2-3a2f77fa2640,181520,2025-12-18 18:47,39.60,3.60,36.00,2,upstream connect error or disconnect/reset before headers. reset reason: connect
+CP,02212988-83fb-4786-b160-16f8c3337f23,181524,2025-12-18 18:48,138.60,12.60,126.00,5,
+CP,995150d4-642e-43f4-ad40-814d21be9499,181515,2025-12-18 18:48,138.60,12.60,126.00,5,
+CP,8a3691a3-30f5-40d3-99c7-644c7e1af08b,181531,2025-12-18 18:49,19.80,1.80,18.00,1,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,19f45761-68e6-4ee0-99bb-07fcd2bbea3f,181525,2025-12-18 18:49,118.80,10.80,108.00,3,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,993651ef-a102-4a69-9b40-f98990b37c29,181516,2025-12-18 18:50,178.20,16.20,162.00,7,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,d74fd0ff-2966-4ead-958c-fadf91419f02,181534,2025-12-18 18:50,118.80,10.80,108.00,5,
+CP,dc68ee93-0a6e-428f-b15f-a4beced3a156,181532,2025-12-18 18:52,150.70,13.70,137.00,5,
+CP,ab7c29ac-4f90-4f01-9399-f04baa834c43,181536,2025-12-18 18:52,79.20,7.20,72.00,2,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,d6326cab-ad06-45c4-82de-9d6765b29b18,181535,2025-12-18 18:52,39.60,3.60,36.00,2,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,24880fb4-26fd-4aff-89c5-4f9f4fd2c1c9,181545,2025-12-18 18:53,79.20,7.20,72.00,3,
+CP,4be17469-3502-4b7a-a17b-ce5e3c92803a,181556,2025-12-18 18:56,99.00,9.00,90.00,4,No active events found. Create an event first. Webhook event: Rua Iluminada Famí
+CP,2bca3482-9365-47ef-8f61-f622adb5e92d,181548,2025-12-18 18:57,79.20,7.20,72.00,3,
+CP,d133381d-ac87-44dc-ad2e-512172ae01e8,181559,2025-12-18 18:57,79.20,7.20,72.00,2,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,cb8abded-1a44-4625-8d26-c9ba28cf14b2,181568,2025-12-18 18:57,39.60,3.60,36.00,2,FINANCIAL_WRITE_FAILED: upstream connect error or disconnect/reset before header
+CP,8fb178f1-6802-4135-806e-cd9823091a6d,181569,2025-12-18 18:58,59.40,5.40,54.00,3,No active events found. Create an event first. Webhook event: Rua Iluminada Famí
+CP,613a8dfb-219f-4010-812e-340963987cd9,181558,2025-12-18 18:58,59.40,5.40,54.00,3,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,5e6ad69d-0b97-4f8f-8279-857692cb9d66,181564,2025-12-18 18:58,158.40,14.40,144.00,5,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,56d6b315-6c13-4d95-bd5d-dc933a020382,181567,2025-12-18 18:58,99.00,9.00,90.00,3,
+CP,bbcf0dd2-0f9e-454b-8c12-43e157806982,181570,2025-12-18 18:59,39.60,3.60,36.00,1,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,81a8fe03-4cd8-4526-9e1a-98831978ac6d,181571,2025-12-18 18:59,118.80,10.80,108.00,3,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,a0fe5564-fabf-46d3-984c-1d72a5b51a71,181563,2025-12-18 19:00,39.60,3.60,36.00,2,
+CP,8f8d7ada-4750-4cd2-be09-6375007cbe1e,181573,2025-12-18 19:00,39.60,3.60,36.00,2,
+CP,fc4cb66b-e9ec-4249-b6f0-bcb5af144c27,181572,2025-12-18 19:00,59.40,5.40,54.00,3,
+CP,d63a2783-9860-489a-9331-1419a46a63b0,181579,2025-12-18 19:01,19.80,1.80,18.00,1,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,007c65ed-0b31-4cb9-a88d-b451b9b37b74,181578,2025-12-18 19:01,59.40,5.40,54.00,2,
+CP,1d38beec-7b3c-436d-8439-0da59ecc2de1,181580,2025-12-18 19:02,39.60,3.60,36.00,1,
+CP,186cee2b-350e-4728-b880-ba25ea7cabd0,181583,2025-12-18 19:03,39.60,3.60,36.00,2,
+CP,d029de37-48ad-4e5a-ae53-0c03c8cc124b,181476,2025-12-18 19:05,39.60,3.60,36.00,2,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,cbb2e5dc-a5a5-4e4e-8a75-0f029ffc54ad,181587,2025-12-18 19:05,178.20,16.20,162.00,7,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,ff28f04f-3f74-4f58-a2ba-e749f1030dc4,181596,2025-12-18 19:07,39.60,3.60,36.00,2,
+CP,c549288b-bb01-4285-92de-754f4b1bbcf6,181593,2025-12-18 19:07,79.20,7.20,72.00,2,
+CP,2efcb1d4-8579-4467-86b2-f8739dfae143,181566,2025-12-18 19:10,79.20,7.20,72.00,2,
+CP,3a39eeba-9c1d-4d08-9c20-fb867f5d96e8,181604,2025-12-18 19:11,59.40,5.40,54.00,2,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,d8b4a9f5-1f3a-48f2-ae07-c4169ae3556a,181609,2025-12-18 19:12,138.60,12.60,126.00,5,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,949b78e4-3729-40e3-861c-10e5ac897498,181602,2025-12-18 19:12,138.60,12.60,126.00,4,No active events found. Create an event first. Webhook event: Rua Iluminada Famí
+CP,3f89842c-006f-4567-8cbb-606630113e65,181613,2025-12-18 19:13,79.20,7.20,72.00,2,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,570639cf-d958-482f-8624-40844aa9eb29,181612,2025-12-18 19:13,79.20,7.20,72.00,3,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,c8b53a89-a978-4361-a5a0-042097849085,181616,2025-12-18 19:13,79.20,7.20,72.00,2,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,d60bb147-2b39-4fac-bca0-e9da72ad8ac6,181611,2025-12-18 19:13,99.00,9.00,90.00,3,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,8589309c-2309-4aff-b744-f874c26ddd27,181619,2025-12-18 19:14,19.80,1.80,18.00,1,No active events found. Create an event first. Webhook event: Rua Iluminada Famí
+CP,91e9605e-ea13-4c92-a8b1-ad9ddb8a1656,181620,2025-12-18 19:15,19.80,1.80,18.00,1,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,904ba9c7-e61a-403b-929a-d90c88625554,181624,2025-12-18 19:16,79.20,7.20,72.00,4,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,a88d8ecd-89f2-40bc-beb7-06653d3c0bad,181622,2025-12-18 19:16,118.80,10.80,108.00,3,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,8d61ea4a-3703-41e8-af2f-888c257665d1,181623,2025-12-18 19:16,198.00,18.00,180.00,5,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,ab37ee99-ccd1-4a18-a78b-035ad233b5c2,181618,2025-12-18 19:16,99.00,9.00,90.00,3,
+CP,7f78c7d8-6e16-42a7-9a76-580cee6fc627,181614,2025-12-18 19:17,79.20,7.20,72.00,4,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,4556f600-9678-4730-80ee-d91ab2fedb2f,181625,2025-12-18 19:17,59.40,5.40,54.00,2,
+CP,6b96ea4b-766d-4961-8d25-97d19358c109,181626,2025-12-18 19:17,99.00,9.00,90.00,4,No active events found. Create an event first. Webhook event: Rua Iluminada Famí
+CP,61dfa775-54e3-4cc2-8f3f-5fe5b9af3f84,181628,2025-12-18 19:18,138.60,12.60,126.00,5,FINANCIAL_WRITE_FAILED: upstream connect error or disconnect/reset before header
+CP,cb4aa766-258d-45f0-a23e-84c682513829,181676,2025-12-18 19:34,59.40,5.40,54.00,2,No active events found. Create an event first. Webhook event: Rua Iluminada Famí
+CP,5b71e32d-e354-44c0-9990-2074ff25c665,181682,2025-12-18 19:35,99.00,9.00,90.00,3,
+CP,fc62af82-7eca-47dc-ab84-a11d0b9f7110,181679,2025-12-18 19:36,158.40,14.40,144.00,6,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,f68e9321-b536-4b29-9b83-c541e78e1c52,182049,2025-12-18 22:37,79.20,7.20,72.00,3,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,9a4d4d80-92ea-4bdb-be9f-e1f071e71b0a,182083,2025-12-18 23:33,79.20,7.20,72.00,3,
+CP,089a9b40-72d4-4387-a3a1-7e90de3d74d6,182086,2025-12-18 23:33,59.40,5.40,54.00,2,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,21505a5f-bc0b-459e-91a0-3fa47f11e711,182089,2025-12-18 23:38,79.20,7.20,72.00,2,
+CP,922f8ff9-5989-4915-8c65-1aedbc455482,182091,2025-12-18 23:39,79.20,7.20,72.00,2,
+CP,216ede96-24b2-4fa1-a0e3-d2be676e0400,182555,2025-12-19 13:01,99.00,9.00,90.00,3,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,26c90d18-96a5-48ba-ac3b-8b1258f6e9f7,183109,2025-12-19 17:39,79.20,7.20,72.00,2,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,7d751175-cb66-4d64-a914-fd970ad07230,183135,2025-12-19 17:56,217.80,19.80,198.00,10,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,2c40cac5-be37-46a4-8080-f8ce82fc3f87,183256,2025-12-19 18:38,158.40,14.40,144.00,6,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,633b00ac-9978-4c14-8de6-10d605cd112f,183355,2025-12-19 19:14,118.80,10.80,108.00,3,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,3ed98df1-91ff-4185-9466-60e48fe0cb9f,183579,2025-12-19 20:49,138.60,12.60,126.00,5,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,73b7cf03-c81b-4cc2-9c73-fda3eff0e20e,183683,2025-12-19 22:26,217.80,19.80,198.00,6,
+ES,e1b43779-8d5d-4cce-a90b-1ce041e29abe,184291,2025-12-20 13:44,118.80,10.80,108.00,4,Order not found for refund: e1b43779-8d5d-4cce-a90b-1ce041e29abe
+CP,56900b30-1a70-433b-a102-0f3d47c5fb4e,185373,2025-12-20 19:51,257.40,23.40,234.00,7,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,a9baa51e-6531-4e62-985d-804e7c96c1e5,186241,2025-12-21 13:25,59.40,5.40,54.00,2,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,7508c388-d331-4276-a405-0def486eb907,186755,2025-12-21 17:16,39.60,3.60,36.00,1,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,43c1c020-5b53-4b74-919e-61f45e84fa5d,186753,2025-12-21 17:17,158.40,14.40,144.00,4,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,c7a018a3-7da9-4671-bd98-8f6a439a677d,186756,2025-12-21 17:17,59.40,5.40,54.00,2,
+CP,7b3e8448-984c-4442-93a5-8ffc287a78ac,186758,2025-12-21 17:18,39.60,3.60,36.00,2,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,d5fb978d-fb50-481f-878d-39b12cbd3825,186761,2025-12-21 17:20,99.00,9.00,90.00,3,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,898fadd2-11db-42ae-ae87-537b1d710902,186764,2025-12-21 17:23,19.80,1.80,18.00,1,
+CP,93707686-da2e-419f-9c02-e0b154127007,186770,2025-12-21 17:24,79.20,7.20,72.00,3,
+CP,785d39d8-0a96-4f58-b70a-b49eccd6fc1f,186773,2025-12-21 17:26,79.20,7.20,72.00,2,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,c6e7f220-8c6d-4568-9f7b-69e9b4f1b139,186774,2025-12-21 17:26,237.60,21.60,216.00,6,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,3364dea2-580f-486d-93df-9ec4cb5ac248,186783,2025-12-21 17:31,59.40,5.40,54.00,2,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,a28f4642-baca-458e-ade6-8ecee5b0cf9b,186789,2025-12-21 17:33,79.20,7.20,72.00,3,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,2a29995d-8d05-46c9-af81-1ddf3b423449,186780,2025-12-21 17:36,118.80,10.80,108.00,3,
+CP,0c223471-3548-4404-89ef-e9e5520f36c3,186791,2025-12-21 17:36,79.20,7.20,72.00,3,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,d413c1b1-5f7d-41cb-9f65-64ef0964f139,186801,2025-12-21 17:40,79.20,7.20,72.00,2,
+CP,90d989d3-9ef8-43d3-a792-c8195f42bc8e,186812,2025-12-21 17:42,59.40,5.40,54.00,2,upstream connect error or disconnect/reset before headers. reset reason: connect
+CP,85ea28d4-020b-488e-b247-86b80f4298de,186797,2025-12-21 17:43,59.40,5.40,54.00,2,
+CP,48de280e-5a60-4be0-bb8a-81e4ea5778f1,187243,2025-12-21 19:23,99.00,9.00,90.00,3,
+CP,93eed1dc-cc08-4fc0-8800-e4dbe3fbb62e,187233,2025-12-21 19:23,79.20,7.20,72.00,3,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,42cf8a84-cc28-4d42-a127-8db11842c098,187262,2025-12-21 19:23,158.40,14.40,144.00,4,
+CP,263719c8-13eb-4d76-a4dc-e15d8472b09a,187276,2025-12-21 19:25,39.60,3.60,36.00,2,
+CP,951505da-1350-4863-8f31-dceafd8ddb62,187284,2025-12-21 19:27,39.60,3.60,36.00,2,
+CP,96339650-c073-4097-bdc4-a396e3ec76fd,187285,2025-12-21 19:28,39.60,3.60,36.00,2,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,2e450ad5-88c0-435e-8bff-93c4ba9b43ab,187302,2025-12-21 19:30,79.20,7.20,72.00,2,upstream connect error or disconnect/reset before headers. reset reason: connect
+CP,9cf154b3-8f70-4d41-90de-baefd755a265,187307,2025-12-21 19:31,99.00,9.00,90.00,3,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,2bbe4747-731f-443f-ba16-f472b0e1d01a,187374,2025-12-21 19:45,39.60,3.60,36.00,1,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,d09b2b96-9fc3-40b6-9361-2eca94854735,187695,2025-12-21 22:24,79.20,7.20,72.00,3,No active events found. Create an event first. Webhook event: Rua Iluminada Famí
+CP,7d8ede9b-6c8c-4c5d-8bbb-8590c01b68a4,187700,2025-12-21 22:28,99.00,9.00,90.00,3,
+CP,b7187e00-d768-4c23-b757-29da8bffcb73,187703,2025-12-21 22:34,178.20,16.20,162.00,6,
+CP,f95e6a03-6e03-4d59-9aea-7687d047387d,188731,2025-12-22 18:46,79.20,7.20,72.00,3,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,81a56808-ad85-4647-9d8c-4e38752a4537,189025,2025-12-22 20:01,118.80,10.80,108.00,3,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,e2636825-9976-4199-b3e1-47e1bf4b0897,189160,2025-12-22 20:46,59.40,5.40,54.00,3,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+ES,2ce6c972-ddb2-4c11-a58c-14d2561bbb59,189700,,59.40,5.40,54.00,3,VALIDATION_ERROR: Invalid payload: data.order.paymentConfirmeDate: Expected stri
+ES,e62e8da1-aff4-4f13-b724-c84b8707cedd,189642,,99.00,9.00,90.00,3,VALIDATION_ERROR: Invalid payload: data.order.paymentConfirmeDate: Expected stri
+CP,bb3f4fdb-dc4d-4ddd-90b2-4b028bd91144,190335,2025-12-23 19:15,99.00,9.00,90.00,3,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,db6e7fd6-0574-45fe-81b5-b45c4918d8f3,190357,2025-12-23 19:21,118.80,10.80,108.00,4,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,d420156f-d540-4a6f-93da-7bb86a33b441,190347,2025-12-23 19:21,99.00,9.00,90.00,3,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,e19fe326-c7f2-4162-8522-f45db7ee0d03,190386,2025-12-23 19:32,158.40,14.40,144.00,5,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,3de922df-8978-43cc-83db-3c3e9a6e1361,190683,2025-12-24 02:41,55.00,5.00,50.00,2,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,8f2759c7-df1d-42e4-a79f-70878ca4311a,190949,2025-12-24 16:29,118.80,10.80,108.00,3,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,1c4786b3-061b-4973-8f27-36bbc801a8c1,191392,2025-12-25 17:33,99.00,9.00,90.00,3,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,1eb3a96d-b6e0-4fce-878f-db3f0b9bfa7d,191664,2025-12-25 20:21,158.40,14.40,144.00,4,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,f7c2a5ef-d1c5-4c51-bd5f-95fff75e37e2,192693,2025-12-26 21:15,59.40,5.40,54.00,2,No active events found. Create an event first. Webhook event: Rua Iluminada Famí
+CP,f92e0d28-3192-4b0c-87ca-e4a927f84e0f,192696,2025-12-26 21:22,232.10,21.10,211.00,9,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,34c309c8-5628-4c80-a9c2-27ccf13bd726,192698,2025-12-26 21:29,99.00,9.00,90.00,3,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,9e4aceb9-4133-4ec3-9bf3-de7322200e4e,192700,2025-12-26 21:32,59.40,5.40,54.00,2,upstream connect error or disconnect/reset before headers. retried and the lates
+CP,0041f5b5-6fee-41f3-819e-9fe1cece6442,192715,2025-12-26 22:37,99.00,9.00,90.00,3,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,33e9428c-76eb-405a-8038-72aeb66fbe7c,192732,2025-12-26 23:48,138.60,12.60,126.00,5,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,3a21b11c-c6d7-48ac-a9cc-f730b5a0496b,192733,2025-12-26 23:48,99.00,9.00,90.00,3,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,86cfd00f-b680-4910-8d05-8499ccd9de84,193301,2025-12-27 16:41,79.20,7.20,72.00,2,FINANCIAL_WRITE_FAILED: undefined
+CP,86f28b9a-0d1d-4117-9bd3-e7e5f2295459,194120,2025-12-28 15:14,79.20,7.20,72.00,2,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,8e89808a-b863-4f1c-a205-a8e0b8a7a13f,194231,2025-12-28 16:51,79.20,7.20,72.00,2,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,7d39790a-2377-4fcd-9cba-f97a9de48fc3,194390,2025-12-28 19:15,74.80,6.80,68.00,3,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,f5440f54-22ec-4c97-9731-d073dec7fc5a,194568,2025-12-29 10:41,39.60,3.60,36.00,2,
+CP,7949655c-e711-4008-98c5-5c127fd8a055,194600,2025-12-29 13:05,158.40,14.40,144.00,5,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,b799f769-90f0-48a9-8cbe-fd0ab9cb5f5f,195135,2025-12-30 14:36,138.60,12.60,126.00,7,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,a67df0b9-a473-4801-b1c9-3815f0b97eaf,195287,2025-12-30 16:14,79.20,7.20,72.00,2,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,0cdf2e58-10d3-45b3-9cb8-e6237342ce1a,195427,2025-12-30 20:38,118.80,10.80,108.00,4,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,d34b6bed-fe81-42e3-a767-6f8de3a64b66,195664,2025-12-31 15:02,86.90,7.90,79.00,4,
+CP,b4e0145d-7485-45f1-8158-7de1b52b6262,196472,2026-01-02 14:51,122.10,11.10,111.00,5,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"
+CP,084c0c11-dbf3-44d4-83a1-6adc17506f86,197713,2026-01-03 20:42,79.20,7.20,72.00,2,"null value in column ""customer_cpf"" of relation ""orders"" violates not-null const"

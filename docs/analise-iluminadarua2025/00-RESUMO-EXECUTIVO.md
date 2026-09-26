@@ -35,6 +35,8 @@ Além disso, dois documentos do próprio repositório **se contradiziam sobre a 
 ### 2. Queda da integração Zet e perda de dados
 **O que aconteceu** (seu relato + código): no dia do apagão da AWS (provavelmente 20/10/2025), o banco ficou fora. O webhook em `api.ruailuminada.com` (Cloudflare → Supabase) **dependia do banco para responder**. Quando tudo voltou, chegou uma enxurrada de requisições (muito provavelmente os reenvios acumulados da Zet), o banco travou, as vendas ficaram gravadas pela metade, os reenvios sobrescreveram registros e somaram estornos em dobro. Os payloads daquela data ficaram corrompidos e os valores deixaram de bater com a plataforma. A reconstituição passo a passo está em `04-INTEGRACAO-ZET.md`, seção 9.
 
+**O que o backup de webhooks mostrou** (`09-ANALISE-WEBHOOKS-ZET.md`): de 22/10/2025 a 04/01/2026, a Zet mandou 26.111 pedidos (R$ 2.067.707,50 líquidos) com valores **sempre consistentes**. A taxa é exatamente 10% do líquido em 26.109 pedidos, e os reenvios nunca mudaram valores. **O erro estava no processamento, não nos dados da Zet.** Além disso, **199 vendas pagas (R$ 24.313,00 líquidos) nunca foram gravadas** pelo sistema antigo, recusadas por CPF ou e-mail ou perdidas quando o banco caiu. Os payloads estão íntegros e podem ser recuperados. A "assinatura" era gerada pelo nosso próprio Worker para qualquer requisição (e nunca bateu), e o IP gravado era sempre o do Cloudflare.
+
 Os fatores do código que transformaram uma queda de infraestrutura em perda de dados:
 - **A Zet não assina os webhooks** (confirmado). O v1 aceitava tudo em modo permissivo e o **v2 não tinha validação nenhuma**. Qualquer pessoa que descobrisse o endereço podia criar vendas falsas ou marcar vendas reais como ESTORNADO.
 - Cada requisição dispara **cerca de 46 operações no banco**, sem transação, sem limite de tamanho do corpo, sem rate limit e com um `sleep` de 2 s em caso de concorrência. Um pico de reenvios (ou de ataque) vira dezenas de escritas por requisição: amplificação perfeita para travar o banco.
@@ -85,3 +87,4 @@ Os fatores do código que transformaram uma queda de infraestrutura em perda de 
 | `06-ROADMAP.md` | Fases de reconstrução com critérios de aceite |
 | `07-CHECKLISTS.md` | Checklist de fechamento financeiro e de segurança para produção |
 | `08-DUVIDAS.md` | Perguntas que só você pode responder |
+| `09-ANALISE-WEBHOOKS-ZET.md` | Análise dos 27.641 webhooks do backup: totais, 199 vendas nunca gravadas, segurança |

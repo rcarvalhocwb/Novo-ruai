@@ -23,6 +23,8 @@ POST https://api.ruailuminada.com/...   // passava pelo Cloudflare até o Supaba
 }
 ```
 
+**Confirmado pelo backup de 27.641 webhooks** (`09-ANALISE-WEBHOOKS-ZET.md`): o payload real também traz, em cada voucher, `used`, `dateTimeUsed`, `subCategory` e `eventsValues.{id, sector, session, eventsDates.startDate/endDate}`; e, no pedido, `webHookTermsAccepted`. O `user-agent` da Zet é `axios/0.27.2`. A Zet reenvia (1.256 pedidos chegaram 2 ou mais vezes) sempre com **os mesmos valores**.
+
 **Confirmado com você:**
 - `totalValue` é o que o cliente pagou, **já com o desconto de campanha aplicado**. `totalTax` é o acréscimo de 10% da Zet sobre o preço. `discount` é só informativo (relatório de campanhas) e **não deve ser subtraído de novo**.
 - O estorno **pode ser parcial** (só alguns ingressos do pedido). No estorno, o evento devolve só o preço do ingresso; a taxa não é estornada pelo evento.
@@ -94,7 +96,7 @@ export default {
     await env.ZET_QUEUE.send({
       sha256: sha,
       received_at: receivedAt,
-      remote_ip: req.headers.get('cf-connecting-ip'),
+      remote_ip: req.headers.get('cf-connecting-ip'), // aqui, na borda, é o IP real da Zet (no Supabase seria o do Worker)
       user_agent: req.headers.get('user-agent'),
     });
     return new Response('{"received":true}', { status: 200, headers: { 'content-type': 'application/json' } });
@@ -142,11 +144,12 @@ create table integ.zet_event_map (
   event_id      uuid not null references public.events(id) on delete restrict
 );
 create table integ.zet_ticket_type_map (
+  zet_events_value_id bigint primary key, -- eventsValues.id (um por data, sessão e tipo); NUNCA o texto da descrição
   zet_event_id  bigint not null,
-  description   text not null,            -- "Inteira", "Meia"...
+  description   text not null,            -- texto original, só para referência (há grafias diferentes)
+  category      text not null,            -- categoria normalizada: inteira, meia, solidario, gazeta...
   ticket_type_id uuid not null,
-  list_price_cents bigint not null,       -- peso para rateio
-  primary key (zet_event_id, description)
+  list_price_cents bigint not null        -- preço líquido de tabela; peso para rateio e validação
 );
 
 -- projeção da venda (estado atual; o histórico está no inbox e no livro-razão)
@@ -239,7 +242,7 @@ if action = CP:
    else:
      net := gross - fee                        -- preço do ingresso = receita do evento
      validar fee ≈ applyRate(net, 1000) com tolerância de 1 centavo por ingresso (senão: exceção, sem bloquear)
-     pesos := list_price_cents de cada voucher (via zet_ticket_type_map)
+     pesos := list_price_cents de cada voucher (via zet_ticket_type_map[eventsValues.id])
      itens := allocate(net, pesos)
      insert order + itens
      post_entry('zet:CP:'||uuid, D A receber Zet net, C Receita online net)

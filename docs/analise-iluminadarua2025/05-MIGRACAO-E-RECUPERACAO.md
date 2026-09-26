@@ -23,7 +23,7 @@ O sistema antigo ainda tem funções públicas que apagam dados (S-01 a S-07). A
 | F4 | **CSV do PagBank** (transações e recebíveis) | Bruto, MDR real, líquido, data de liquidação | Muito alta para cartão/PIX | Painel PagBank; o parser `pagbank-csv-parser.ts` já existe |
 | F5 | **PDFs de fechamento assinados** (`closure_pdf_attachments`, storage) | Totais declarados por dia, com assinatura | Alta para o **declarado**, não para o real | Storage do Supabase |
 | F6 | **Backups R2** (desde 09/12/2025) | Tabelas até 10.000 linhas cada | Média (pode estar truncado) | Bucket R2 |
-| F7 | **`webhook_logs` / `zet_sales_master.webhook_payload`** remanescentes | Payload bruto de cada venda recebida | Alta para o que sobrou | Dump do banco |
+| F7 | **Backup de webhooks** (`webhooks-zet-backup.zip`, 27.641 webhooks, 22/10/2025 a 04/01/2026) | Payload bruto e intacto de cada venda e estorno recebido | **Muito alta** no período coberto (valores consistentes, taxa exata; ver `09-ANALISE-WEBHOOKS-ZET.md`) | Já exportado; guardar fora do repositório (tem dados pessoais) |
 | F8 | **Logs de e-mail de confirmação** (Brevo, `send-purchase-email`) | Pedido, cliente, valor, data | Média; ajuda a provar vendas cujo registro sumiu | Painel do Brevo |
 | F9 | **Validações de catraca** (`access_events`, middleware) | Vouchers usados | Média; prova de que o ingresso existiu | Dump e logs do middleware |
 | F10 | Arquivos `data/imports/*.json` e planilhas manuais | Importações manuais de novembro | Baixa a média | Repositório |
@@ -70,6 +70,10 @@ Os payloads dessa data estão **corrompidos** (valores não batem com a platafor
 2. Os registros do banco antigo daquela data (`zet_sales_master`, `online_sales_transactions`, `orders`, `webhook_logs`) entram apenas como **evidência** para explicar a diferença (duplicados, sobrescritos, estornos em dobro), nunca como valor.
 3. Exportar do Cloudflare (Analytics/Logs de `api.ruailuminada.com`) o volume de requisições por minuto e os IPs daquele dia. Serve para saber se foi **reenvio em massa da Zet** (IPs da Zet, payloads repetidos) ou **tráfego malicioso** (IPs estranhos, payloads que não existem no relatório).
 4. Pedidos que existem no banco antigo mas não no relatório da Zet daquela data: tratar como **suspeitos** (possível venda forjada, já que o webhook não tinha assinatura) até a Zet confirmar.
+
+### 2.1b Vendas nunca gravadas pelo sistema antigo
+
+`dados/zet-webhooks-nao-processados.csv` lista **199 compras (R$ 24.313,00 líquidos) e 9 estornos** cujo payload está no backup mas que o sistema antigo recusou ou perdeu. Recuperar processando esses payloads no novo worker, depois de conferir no relatório da Zet que não foram importados por planilha.
 
 ### 2.2 Vendas online (Zet)
 1. **Base = F2** (relatório Zet), pedido a pedido.

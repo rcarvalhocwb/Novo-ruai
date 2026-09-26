@@ -20,8 +20,8 @@ A análise marcou como **[DÚVIDA]** tudo o que o código não permite afirmar. 
 
 11. ~~Assinatura~~ **Respondida:** a Zet **não assina** os webhooks.
 12. O endereço do webhook pode ser configurado com um **token secreto** (no caminho ou num header fixo)? Isso é essencial, já que não há assinatura.
-13. Quais são os **IPs de origem** dos webhooks (para liberar só eles no Cloudflare)?
-14. Qual é a política de **reenvio** (quantas tentativas, intervalo, o que conta como sucesso)? Foi isso que gerou a enxurrada depois do apagão?
+13. Quais são os **IPs de origem** dos webhooks? O histórico não ajuda: o sistema antigo gravou só o IP do Cloudflare. O `user-agent` da Zet é `axios/0.27.2`.
+14. Qual é a política de **reenvio** (quantas tentativas, intervalo, o que conta como sucesso)? O backup mostra reenvios (1.256 pedidos com 2 ou mais entregas), mas 72 webhooks que deram erro de conexão nunca chegaram de novo com sucesso.
 15. Existe **API de consulta** de pedidos (por período e por uuid) ou só export do painel?
 16. Existe relatório de **composição de cada repasse** (quais pedidos entraram)?
 
@@ -32,6 +32,9 @@ A análise marcou como **[DÚVIDA]** tudo o que o código não permite afirmar. 
 19. Qual é a **data exata** do incidente? (Provavelmente 20/10/2025.)
 20. O plano do Cloudflare guarda **logs/analytics** daquele dia? Eles mostram se a enxurrada veio da Zet (reenvios) ou de outros IPs.
 21. O sistema antigo ainda está no ar e recebendo webhooks?
+22. O backup começa em 22/10/2025. As vendas online começaram nessa data, ou os webhooks anteriores (incluindo o dia do apagão) foram os que se perderam?
+23. Os pedidos `11348743…` e `1bf61e84…` têm taxa diferente de 10% do líquido no próprio payload. Houve alguma condição especial neles?
+24. Os 20 pedidos de Inteira a R$ 50,00 líquidos (e 1 a R$ 72,00) correspondem a datas ou sessões com preço diferente?
 
 ---
 
