@@ -30,7 +30,7 @@ Esses totais são o que **os webhooks** dizem. Eles só viram verdade financeira
 ## 2. Os dados da Zet são consistentes; o problema estava no nosso processamento
 
 - **Nenhum valor com mais de 2 casas decimais** no JSON original.
-- **Taxa exata**: em 26.109 dos 26.111 pedidos, `totalTax` é exatamente `arredondar(líquido × 10%)`, sem nenhum centavo de diferença. As 2 exceções (`11348743…` e `1bf61e84…`) são justamente os pedidos "corrigidos à mão" em `docs/FINANCIAL-CORRECTIONS-LOG.md` e precisam ser conferidos no painel da Zet.
+- **Taxa exata**: em 26.109 dos 26.111 pedidos, `totalTax` é exatamente `arredondar(líquido × 10%)`, sem nenhum centavo de diferença. As 2 exceções (`11348743…` e `1bf61e84…`) são justamente os pedidos "corrigidos à mão" em `docs/FINANCIAL-CORRECTIONS-LOG.md`. **Confirmado:** a Zet estava cobrando errado a taxa da meia-entrada e corrigiu depois que o sistema identificou a diferença. O payload guarda a taxa errada; o valor que vale é o do relatório e do repasse da Zet. Isso mostra o valor da validação automática da taxa: ela pegou um erro real da Zet.
 - **Nenhum desconto** (`discount = 0` em todos) e **nenhum estorno parcial** neste período: os 226 estornos têm os mesmos vouchers e o mesmo valor do pedido original. O desenho continua preparado para os dois casos.
 - **Reenvios idênticos**: 1.256 pedidos chegaram 2 vezes (4 chegaram 3 vezes e 1 chegou 5 vezes). **Em nenhum caso os valores mudaram entre um envio e outro.**
 
@@ -68,12 +68,13 @@ Vendas **pagas** foram recusadas por causa de **CPF ou e-mail**, campos que não
 
 ## 5. O que muda no desenho
 
+- **Preço por sessão**: há sessões especiais com preço próprio (ex.: sessões de teste com brindes). Por isso o preço de tabela é guardado por `eventsValues.id` (data, sessão e tipo), e não só por categoria.
 - **Chave do tipo de ingresso**: existem 16 grafias diferentes de descrição para as mesmas categorias (ex.: três variações de "Doador de sangue/Portadores de câncer/ID jovem…"), e 1.692 `eventsValues.id` (um por data, sessão e tipo). O de-para deve usar **`eventsValues.id`** (preço por data e sessão), agrupado numa categoria normalizada, e **nunca o texto** da descrição.
 - **Preços líquidos observados** (servem para a validação de conteúdo do webhook):
 
   | Categoria | Líquido por ingresso |
   |---|---|
-  | Inteira | R$ 36,00 (20 pedidos a R$ 50,00 e 1 a R$ 72,00: conferir datas especiais) |
+  | Inteira | R$ 36,00 (os 20 pedidos a R$ 50,00 e o de R$ 72,00 são **sessões de teste com brindes e horário especial**, com preço próprio) |
   | Solidário + 1 kg de alimento | R$ 25,00 (30 pedidos a R$ 18,00) |
   | Assinante Clube Gazeta | R$ 32,50 |
   | Meia-entrada, Idosos, Crianças 6–12, Professores/Saúde, Doador de sangue/ID Jovem, PCD/Autista e acompanhante | R$ 18,00 |
@@ -89,6 +90,6 @@ Vendas **pagas** foram recusadas por causa de **CPF ou e-mail**, campos que não
 1. O backup é **fonte F7** (`05-MIGRACAO-E-RECUPERACAO.md`) e, para o período 22/10/2025 a 04/01/2026, é **muito confiável**: payload intacto, valores consistentes, taxa exata.
 2. Carregar `payloads-fieis.jsonl` no schema `recovery` e processar com o **novo worker** (idempotente). Isso já produz as vendas e os estornos do período no livro-razão.
 3. Conciliar com o relatório da Zet (F2) pedido a pedido. O README cita cobertura de webhook "em torno de 30% em determinados períodos": **o que estiver no relatório e não no backup** foram vendas cujo webhook nunca chegou, e entram pelo relatório.
-4. **Antes de 22/10/2025 não há webhooks no backup.** O dia do apagão da AWS (20/10/2025) e anteriores só podem ser reconstruídos pelo relatório da Zet e pelos extratos.
+4. **As vendas online começaram em 15/10/2025, mas o backup não tem nenhum pedido pago antes de 22/10/2025.** Os webhooks dessa primeira semana (15/10 a 21/10, que inclui o apagão da AWS em 20/10) foram enviados mais tarde e não estão no backup. Esse período só pode ser reconstruído pelo **relatório da Zet** e pelos extratos.
 5. Excluir do cálculo: evento 355 (teste), envios pelo Postman e os estornos "Admin Manual Refund" (conferir cada um no painel da Zet).
 6. Somar o líquido por data de repasse e comparar com os créditos da Zet no extrato bancário.

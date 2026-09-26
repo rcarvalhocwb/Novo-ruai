@@ -62,7 +62,9 @@ create table recovery.rows (
 create index on recovery.rows(source, natural_key);
 ```
 
-### 2.1a A data do incidente (dia do apagão da AWS)
+### 2.1a A primeira semana de vendas (15/10 a 21/10/2025) e o dia do apagão da AWS
+
+As vendas online começaram em **15/10/2025**, mas o backup de webhooks só tem pedidos pagos a partir de **22/10/2025**. A primeira semana inteira, incluindo o dia do apagão, vem só do relatório da Zet (F2), do extrato de repasses (F3) e do extrato bancário (F1).
 
 Os payloads dessa data estão **corrompidos** (valores não batem com a plataforma), então **não servem como fonte**:
 

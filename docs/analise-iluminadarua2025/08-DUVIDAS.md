@@ -32,9 +32,9 @@ A análise marcou como **[DÚVIDA]** tudo o que o código não permite afirmar. 
 19. Qual é a **data exata** do incidente? (Provavelmente 20/10/2025.)
 20. O plano do Cloudflare guarda **logs/analytics** daquele dia? Eles mostram se a enxurrada veio da Zet (reenvios) ou de outros IPs.
 21. O sistema antigo ainda está no ar e recebendo webhooks?
-22. O backup começa em 22/10/2025. As vendas online começaram nessa data, ou os webhooks anteriores (incluindo o dia do apagão) foram os que se perderam?
-23. Os pedidos `11348743…` e `1bf61e84…` têm taxa diferente de 10% do líquido no próprio payload. Houve alguma condição especial neles?
-24. Os 20 pedidos de Inteira a R$ 50,00 líquidos (e 1 a R$ 72,00) correspondem a datas ou sessões com preço diferente?
+22. ~~Início do backup~~ **Respondida:** as vendas começaram em 15/10/2025; os webhooks foram enviados depois. O período 15/10 a 21/10 não está no backup e sai do relatório da Zet.
+23. ~~Taxa diferente~~ **Respondida:** a Zet cobrava errado a taxa da meia-entrada e corrigiu depois que o sistema apontou. Vale o valor do relatório e do repasse.
+24. ~~Inteira a R$ 50 e R$ 72~~ **Respondida:** sessões de teste com brindes e horário especial, com preço próprio.
 
 ---
 

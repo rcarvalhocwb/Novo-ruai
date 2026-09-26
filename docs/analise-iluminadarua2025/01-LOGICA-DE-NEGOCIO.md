@@ -80,6 +80,12 @@ Consequências:
 
 **Desconto (confirmado):** só existe em **campanhas**. O `totalValue` que a Zet envia **já vem com o desconto aplicado**, e a taxa é calculada sobre o valor com desconto. O campo `discount` é só informativo, para o relatório de campanhas. O webhook antigo gravava `orders.total_amount = totalValue − discount`, ou seja, **subtraía o desconto duas vezes** (P-13).
 
+**Início das vendas online (confirmado):** 15/10/2025.
+
+**Preço por sessão (confirmado):** existem sessões especiais com preço próprio (ex.: sessões de teste com brindes e horário especial). O preço de tabela é guardado por data, sessão e tipo de ingresso.
+
+**Erro de taxa da Zet (confirmado):** a Zet já cobrou taxa errada na meia-entrada e corrigiu depois que o sistema apontou. A validação automática da taxa continua obrigatória.
+
 **Estorno parcial (confirmado):** a Zet pode estornar só alguns ingressos de um pedido. O estorno é tratado ingresso a ingresso.
 
 **Dia operacional do online (confirmado):** vai de 00:00 a 23:59:59 no horário de Brasília (`America/Sao_Paulo`), pela data de pagamento.
